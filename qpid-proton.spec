@@ -118,7 +118,7 @@ rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
 * Wed Jan 16 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-1
-- Rebased on Proton 0.3 RC1.
+- Rebased on Proton 0.3.
 
 * Fri Dec 28 2012 Darryl L. Pierce <dpierce@redhat.com> - 0.2-2.4
 - Moved ownership of the docs dir to the docs package.
