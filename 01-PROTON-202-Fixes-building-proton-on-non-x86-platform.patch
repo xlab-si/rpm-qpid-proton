@@ -1,0 +1,31 @@
+From d50d9bfe0b84dcdcb8f2f627b50719a7d61d6dab Mon Sep 17 00:00:00 2001
+From: mcpierce <mcpierce@13f79535-47bb-0310-9956-ffa450edef68>
+Date: Fri, 25 Jan 2013 14:56:42 +0000
+Subject: [PATCH] PROTON-202: Fixes building proton on non-x86 platforms.
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Submitted by: Dan Horák <dan@danny.cz>
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/proton/trunk@1438546 13f79535-47bb-0310-9956-ffa450edef68
+---
+ proton-c/src/codec/codec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/proton-c/src/codec/codec.c b/proton-c/src/codec/codec.c
+index 5e57f81..d72acc0 100644
+--- a/proton-c/src/codec/codec.c
++++ b/proton-c/src/codec/codec.c
+@@ -1353,7 +1353,7 @@ int pn_data_vscan(pn_data_t *data, const char *fmt, va_list ap)
+   while (*fmt) {
+     char code = *(fmt++);
+ 
+-    bool found;
++    bool found = false;
+     pn_type_t type;
+ 
+     bool scanned;
+-- 
+1.8.1
+
