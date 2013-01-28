@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.3
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -21,6 +21,7 @@ BuildRequires:  epydoc
 
 # BZ#901526
 Patch1: 01-PROTON-202-Fixes-building-proton-on-non-x86-platform.patch
+Patch2: 02-PROTON-202-Assigns-a-default-value-to-scanned-in-cod.patch
 
 
 %description
@@ -84,6 +85,7 @@ Summary: Documentation for the Python language bindings for Qpid Proton
 %setup -q -n qpid-proton-c-%{version}
 
 %patch1 -p2
+%patch2 -p2
 
 
 %build
@@ -123,6 +125,10 @@ rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 
 %changelog
+* Mon Jan 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-3
+- Fixes build failure on non-x86 platforms.
+- Resolves: BZ#901526
+
 * Fri Jan 25 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-2
 - Fixes build failure on non-x86 platforms.
 - Resolves: BZ#901526
