@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.3
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -22,6 +22,8 @@ BuildRequires:  epydoc
 # BZ#901526
 Patch1: 01-PROTON-202-Fixes-building-proton-on-non-x86-platform.patch
 Patch2: 02-PROTON-202-Assigns-a-default-value-to-scanned-in-cod.patch
+# PROTON-230, PROTON-246
+Patch3: 03-PROTON-230-PROTON-246-Copying-nested-data-fails-in-s.patch
 
 
 %description
@@ -86,6 +88,7 @@ Summary: Documentation for the Python language bindings for Qpid Proton
 
 %patch1 -p2
 %patch2 -p2
+%patch3 -p2
 
 
 %build
@@ -125,6 +128,10 @@ rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 
 %changelog
+* Thu Feb 21 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-4
+- Fixes copying nested data.
+- PROTON-246, PROTON-230
+
 * Mon Jan 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-3
 - Fixes build failure on non-x86 platforms.
 - Resolves: BZ#901526
