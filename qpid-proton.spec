@@ -1,15 +1,15 @@
 %global proton_datadir %{_datadir}/proton-%{version}
 
 Name:           qpid-proton
-Version:        0.3
-Release:        4%{?dist}
+Version:        0.4
+Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
-Source0:        http://www.apache.org/dist/qpid/proton/%{version}/qpid-proton-c-%{version}.tar.gz
+Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  cmake >= 2.6
+BuildRequires:  cmake28
 BuildRequires:  swig
 BuildRequires:  pkgconfig
 BuildRequires:  doxygen
@@ -17,13 +17,6 @@ BuildRequires:  libuuid-devel
 BuildRequires:  openssl-devel
 BuildRequires:  python-devel
 BuildRequires:  epydoc
-
-
-# BZ#901526
-Patch1: 01-PROTON-202-Fixes-building-proton-on-non-x86-platform.patch
-Patch2: 02-PROTON-202-Assigns-a-default-value-to-scanned-in-cod.patch
-# PROTON-230, PROTON-246
-Patch3: 03-PROTON-230-PROTON-246-Copying-nested-data-fails-in-s.patch
 
 
 %description
@@ -84,15 +77,11 @@ Summary: Documentation for the Python language bindings for Qpid Proton
 
 
 %prep
-%setup -q -n qpid-proton-c-%{version}
-
-%patch1 -p2
-%patch2 -p2
-%patch3 -p2
+%setup -q -n %{name}-%{version}
 
 
 %build
-%cmake -DPROTON_DISABLE_RPATH=true .
+%cmake28 -DPROTON_DISABLE_RPATH=true .
 make all docs %{?_smp_mflags}
 
 
@@ -101,13 +90,13 @@ make all docs %{?_smp_mflags}
 
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
 
-install -m 644 docs/man/proton.1 %{buildroot}%{_mandir}/man1/proton.1
-
 # clean up files that are not shipped
 rm -rf %{buildroot}%{_libdir}/php
+rm -rf %{buildroot}%{_libdir}/java
+rm -rf %{buildroot}%{_libdir}/libproton-jni.so
 rm -rf %{buildroot}%{_datarootdir}/php
+rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
-
 
 %post -p /sbin/ldconfig
 
@@ -128,6 +117,10 @@ rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 
 %changelog
+* Wed Mar 13 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-1
+- Rebased on Proton 0.4.
+- On EL6 BR pulls in Cmake 2.8 on PPC/PPC64.
+
 * Thu Feb 21 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-4
 - Fixes copying nested data.
 - PROTON-246, PROTON-230
