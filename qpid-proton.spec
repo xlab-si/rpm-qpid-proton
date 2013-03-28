@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.4
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -27,16 +27,42 @@ standard. Using Proton it is trivial to integrate with the AMQP 1.0 ecosystem
 from any platform, environment, or language.
 
 
-%package -n qpid-proton-devel
+%package -n qpid-proton-c
+Summary:  C librarys for Qpid Proton
+
+
+%description -n qpid-proton-c
+%{summary}.
+
+
+%files -n qpid-proton-c
+%defattr(-,root,root,-)
+%dir %{proton_datadir}
+%doc %{proton_datadir}/LICENSE
+%doc %{proton_datadir}/README
+%doc %{proton_datadir}/TODO
+%{_mandir}/man1/*
+%{_bindir}/proton
+%{_bindir}/proton-dump
+%{_libdir}/libqpid-proton.so.*
+
+
+%post -n qpid-proton-c -p /sbin/ldconfig
+
+
+%postun -n qpid-proton-c -p /sbin/ldconfig
+
+
+%package -n qpid-proton-c-devel
 Requires: %{name}%{?_isa} = %{version}-%{release}
 Summary:  Development libraries for writing messaging apps with Qpid Proton
 
 
-%description -n qpid-proton-devel
+%description -n qpid-proton-c-devel
 %{summary}.
 
 
-%files -n qpid-proton-devel
+%files -n qpid-proton-c-devel
 %defattr(-,root,root,-)
 %{_includedir}/proton
 %{_libdir}/libqpid-proton.so
@@ -98,25 +124,10 @@ rm -rf %{buildroot}%{_datarootdir}/php
 rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
-%post -p /sbin/ldconfig
-
-
-%postun -p /sbin/ldconfig
-
-
-%files
-%defattr(-,root,root,-)
-%dir %{proton_datadir}
-%doc %{proton_datadir}/LICENSE
-%doc %{proton_datadir}/README
-%doc %{proton_datadir}/TODO
-%{_mandir}/man1/*
-%{_bindir}/proton
-%{_bindir}/proton-dump
-%{_libdir}/libqpid-proton.so.*
-
-
 %changelog
+* Thu Mar 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2
+- Moved all C libraries to the new qpid-proton-c subpackage.
+
 * Wed Mar 13 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-1
 - Rebased on Proton 0.4.
 - On EL6 BR pulls in Cmake 2.8 on PPC/PPC64.
