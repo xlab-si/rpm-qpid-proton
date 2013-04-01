@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.4
-Release:        2%{?dist}
+Release:        2.1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -54,7 +54,7 @@ Summary:  C librarys for Qpid Proton
 
 
 %package -n qpid-proton-c-devel
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 Summary:  Development libraries for writing messaging apps with Qpid Proton
 
 
@@ -73,7 +73,7 @@ Summary:  Development libraries for writing messaging apps with Qpid Proton
 %package -n python-qpid-proton
 Summary:  Python language bindings for the Qpid Proton messaging framework
 
-Requires: %{name}%{?_isa} = %{version}-%{release}
+Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 Requires: python
 
 
@@ -125,6 +125,9 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
+* Mon Apr  1 2013 Darryl L. Pierce <dpierce@rehdat.com> - 0.4-2.1
+- Fixed the dependencies for qpid-proton-devel and python-qpid-proton.
+
 * Thu Mar 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2
 - Moved all C libraries to the new qpid-proton-c subpackage.
 
