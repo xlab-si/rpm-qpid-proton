@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.4
-Release:        2.1%{?dist}
+Release:        2.2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -28,7 +28,9 @@ from any platform, environment, or language.
 
 
 %package -n qpid-proton-c
-Summary:  C librarys for Qpid Proton
+Summary:   C librarys for Qpid Proton
+Obsoletes: qpid-proton < %{version}-%{release}
+Provides:  qpid-proton = %{version}-%{release}
 
 
 %description -n qpid-proton-c
@@ -54,8 +56,10 @@ Summary:  C librarys for Qpid Proton
 
 
 %package -n qpid-proton-c-devel
-Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
-Summary:  Development libraries for writing messaging apps with Qpid Proton
+Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
+Summary:   Development libraries for writing messaging apps with Qpid Proton
+Obsoletes: qpid-proton-devel < %{version}-%{release}
+Provides:  qpid-proton-devel = %{version}-%{release}
 
 
 %description -n qpid-proton-c-devel
@@ -125,7 +129,11 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
-* Mon Apr  1 2013 Darryl L. Pierce <dpierce@rehdat.com> - 0.4-2.1
+* Fri Apr  4 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2.2
+- Added Obsoletes and Provides for packages whose names changed.
+- Resolves: BZ#948784
+
+* Mon Apr  1 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2.1
 - Fixed the dependencies for qpid-proton-devel and python-qpid-proton.
 
 * Thu Mar 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2
