@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.4
-Release:        2.2%{?dist}
+Release:        3%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -18,6 +18,11 @@ BuildRequires:  openssl-devel
 BuildRequires:  python-devel
 BuildRequires:  epydoc
 
+
+Patch1: 01-NO-JIRA-Fixed-RHEL5-build-errors.patch
+# BZ#975723
+Patch2: 02-PROTON-348-Platform-neutral-helper-functions-for-exa.patch
+Patch3: 03-PROTON-364-Install-C-examples.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -72,6 +77,7 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
 %{proton_datadir}/docs/api-c
+%{_datadir}/proton/examples
 
 
 %package -n python-qpid-proton
@@ -109,6 +115,9 @@ Summary: Documentation for the Python language bindings for Qpid Proton
 %prep
 %setup -q -n %{name}-%{version}
 
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
 
 %build
 %cmake -DPROTON_DISABLE_RPATH=true .
@@ -121,14 +130,20 @@ make all docs %{?_smp_mflags}
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
 
 # clean up files that are not shipped
+rm -rf %{buildroot}%{_libdir}/perl5
 rm -rf %{buildroot}%{_libdir}/php
 rm -rf %{buildroot}%{_libdir}/java
+rm -rf %{buildroot}%{_libdir}/ruby
 rm -rf %{buildroot}%{_libdir}/libproton-jni.so
 rm -rf %{buildroot}%{_datarootdir}/php
 rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
+* Wed Jul 24 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-3
+- Provide examples for qpid-proton-c
+- Resolves: BZ#975723
+
 * Fri Apr  4 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2.2
 - Added Obsoletes and Provides for packages whose names changed.
 - Resolves: BZ#948784
