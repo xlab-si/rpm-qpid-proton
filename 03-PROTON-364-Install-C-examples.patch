@@ -1,0 +1,76 @@
+From bd97c8923c55063a66233e400fbd57cb772664e4 Mon Sep 17 00:00:00 2001
+From: mcpierce <mcpierce@13f79535-47bb-0310-9956-ffa450edef68>
+Date: Wed, 24 Jul 2013 18:31:44 +0000
+Subject: [PATCH 3/3] PROTON-364: Install C examples.
+
+Added a install variable, EXAMPLES_INSTALL_DIR.
+
+Installs the send.c, recv.c, CMakeLists.txt files from the
+examples/messenger/c directory. Also installs the getopt.c and getopt.h
+files, related LICENSE, and the misc_defs.h and misc_funcs.inc files.
+
+git-svn-id: https://svn.apache.org/repos/asf/qpid/proton/trunk@1506653 13f79535-47bb-0310-9956-ffa450edef68
+---
+ CMakeLists.txt                      | 21 +++++++++++++++++++++
+ examples/messenger/c/CMakeLists.txt |  6 ++++++
+ 2 files changed, 27 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f16a570..9e852c3 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -69,6 +69,14 @@ set (SYSCONF_INSTALL_DIR etc CACHE PATH "System read only configuration director
+ set (SHARE_INSTALL_DIR share CACHE PATH "Shared read only data directory")
+ set (MAN_INSTALL_DIR share/man CACHE PATH "Manpage directory")
+ 
++if (WIN32)
++  set (EXAMPLES_INSTALL_DIR proton/examples)
++endif (WIN32)
++
++if (UNIX)
++  set (EXAMPLES_INSTALL_DIR ${SHARE_INSTALL_DIR}/proton/examples)
++endif (UNIX)
++
+ set (JAVA_INSTALL_DIR ${SHARE_INSTALL_DIR}/java CACHE PATH "Installation directory for all JARs except those using JNI")
+ set (JNI_INSTALL_DIR ${LIB_INSTALL_DIR}/java CACHE PATH "Installation directory for all JARs utilising JNI")
+ set (JNI_SHARED_LIB_INSTALL_DIR ${LIB_INSTALL_DIR} CACHE PATH "Installation directory for shared objects used by JNI JARs")
+@@ -99,6 +107,19 @@ add_subdirectory(proton-c)
+ install (FILES LICENSE README TODO
+          DESTINATION ${PROTON_SHARE})
+ 
++# install the C messenger example
++install (FILES examples/messenger/c/CMakeLists.txt
++               examples/messenger/c/send.c
++               examples/messenger/c/recv.c
++         DESTINATION ${EXAMPLES_INSTALL_DIR}/messenger)
++
++install (FILES examples/include/pncompat/internal/LICENSE
++               examples/include/pncompat/internal/getopt.c
++               examples/include/pncompat/internal/getopt.h
++               examples/include/pncompat/misc_defs.h
++               examples/include/pncompat/misc_funcs.inc
++         DESTINATION ${EXAMPLES_INSTALL_DIR}/messenger/pncompat)
++
+ # add relevant CTest support
+ find_program (MAVEN_EXECUTABLE mvn DOC "Location of the maven program")
+ if (JAVA_FOUND AND MAVEN_EXECUTABLE AND DEFINED ENV{M2_HOME})
+diff --git a/examples/messenger/c/CMakeLists.txt b/examples/messenger/c/CMakeLists.txt
+index 4d2719c..faf5e85 100644
+--- a/examples/messenger/c/CMakeLists.txt
++++ b/examples/messenger/c/CMakeLists.txt
+@@ -17,6 +17,12 @@
+ # under the License.
+ #
+ 
++cmake_minimum_required (VERSION 2.6)
++
++find_path(PROTON_INCLUDE_DIR proton/types.h)
++find_library(PROTON_LIBRARY
++             NAMES qpid-proton)
++
+ add_executable(recv recv.c)
+ add_executable(send send.c)
+ 
+-- 
+1.8.3.1
+
