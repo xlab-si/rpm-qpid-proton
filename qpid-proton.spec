@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.4
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -140,6 +140,9 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
+* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.4-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
+
 * Wed Jul 24 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-3
 - Provide examples for qpid-proton-c
 - Resolves: BZ#975723
