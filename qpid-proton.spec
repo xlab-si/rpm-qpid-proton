@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.4
-Release:        4%{?dist}
+Release:        5%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -153,7 +153,7 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
-* Mon Aug 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-4
+* Mon Aug 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-5
 - Created the qpid-proton-c-devel-doc subpackage.
 - Resolves: BZ#1000615
 
