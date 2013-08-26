@@ -76,8 +76,21 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_includedir}/proton
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
+
+
+%package -n qpid-proton-c-devel-doc
+Summary:   Documentation for the C development libraries for Qpid Proton
+BuildArch: noarch
+
+%description -n qpid-proton-c-devel-doc
+%{summary}.
+
+%files -n qpid-proton-c-devel-doc
+%defattr(-,root,root,-)
 %{proton_datadir}/docs/api-c
 %{_datadir}/proton/examples
+
+
 
 
 %package -n python-qpid-proton
@@ -140,6 +153,10 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
+* Mon Aug 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-4
+- Created the qpid-proton-c-devel-doc subpackage.
+- Resolves: BZ#1000615
+
 * Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.4-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
