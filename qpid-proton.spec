@@ -1,8 +1,8 @@
 %global proton_datadir %{_datadir}/proton-%{version}
 
 Name:           qpid-proton
-Version:        0.4
-Release:        5%{?dist}
+Version:        0.5
+Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -19,10 +19,8 @@ BuildRequires:  python-devel
 BuildRequires:  epydoc
 
 
-Patch1: 01-NO-JIRA-Fixed-RHEL5-build-errors.patch
-# BZ#975723
-Patch2: 02-PROTON-348-Platform-neutral-helper-functions-for-exa.patch
-Patch3: 03-PROTON-364-Install-C-examples.patch
+# BZ#1000620
+Patch1: 01-PROTON-412-Fix-the-include-and-lib-directories-in-li.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -129,8 +127,6 @@ Summary: Documentation for the Python language bindings for Qpid Proton
 %setup -q -n %{name}-%{version}
 
 %patch1 -p1
-%patch2 -p1
-%patch3 -p1
 
 %build
 %cmake28 -DPROTON_DISABLE_RPATH=true .
@@ -153,6 +149,10 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
+* Wed Aug 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-5
+- Rebased on Proton 0.5.
+- Resolves: BZ#1000620
+
 * Mon Aug 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-5
 - Created the qpid-proton-c-devel-doc subpackage.
 - Resolves: BZ#1000615
