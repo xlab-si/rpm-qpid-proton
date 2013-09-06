@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.5
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -111,7 +111,8 @@ Requires: python
 
 
 %package -n python-qpid-proton-doc
-Summary: Documentation for the Python language bindings for Qpid Proton
+Summary:   Documentation for the Python language bindings for Qpid Proton
+BuildArch: noarch
 
 
 %description -n python-qpid-proton-doc
@@ -149,7 +150,11 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
-* Wed Aug 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-5
+* Fri Sep  6 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-2
+- Made python-qpid-proton-doc a noarch package.
+- Resolves: BZ#1005058
+
+* Wed Aug 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-1
 - Rebased on Proton 0.5.
 - Resolves: BZ#1000620
 
