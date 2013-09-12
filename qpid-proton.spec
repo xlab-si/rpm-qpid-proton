@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.5
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -18,6 +18,10 @@ BuildRequires:  openssl-devel
 BuildRequires:  python-devel
 BuildRequires:  epydoc
 
+# Java
+BuildRequires:  maven-local
+BuildRequires:  mockito
+BuildRequires:  bouncycastle
 
 # BZ#1000620
 Patch1: 01-PROTON-412-Fix-the-include-and-lib-directories-in-li.patch
@@ -123,33 +127,61 @@ BuildArch: noarch
 %defattr(-,root,root,-)
 %{proton_datadir}/docs
 
+%package -n qpid-proton-java
+Summary:   Java libraries for Qpid Proton
+
+%description -n qpid-proton-java
+Java language bindings for the Qpid Proton messaging framework
+
+%package -n qpid-proton-javadoc
+Summary:   Javadocs for Qpid Proton
+
+%description -n qpid-proton-javadoc
+This package contains the API documentation for %{name}.
+
+%files -n qpid-proton-java -f .mfiles
+%dir %{_javadir}/%{name}
+
+%files -n qpid-proton-javadoc -f .mfiles-javadoc
+
 
 %prep
 %setup -q -n %{name}-%{version}
 
 %patch1 -p1
 
+sed -i 's|bcpkix-jdk15on|bcprov-jdk16|' proton-j/proton/pom.xml
+
+%pom_disable_module "contrib/proton-hawtdispatch" proton-j/pom.xml
+%pom_disable_module "tests"
+
 %build
 %cmake -DPROTON_DISABLE_RPATH=true .
 make all docs %{?_smp_mflags}
 
+%mvn_build
 
 %install
 %make_install
+
+%mvn_install
 
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
 
 # clean up files that are not shipped
 rm -rf %{buildroot}%{_libdir}/perl5
 rm -rf %{buildroot}%{_libdir}/php
-rm -rf %{buildroot}%{_libdir}/java
 rm -rf %{buildroot}%{_libdir}/ruby
+rm -rf %{buildroot}%{_libdir}/java/*.jar
 rm -rf %{buildroot}%{_libdir}/libproton-jni.so
 rm -rf %{buildroot}%{_datarootdir}/php
-rm -rf %{buildroot}%{_datarootdir}/java
+rm -rf %{buildroot}%{_datarootdir}/java/*.jar
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 
 %changelog
+* Thu Sep 12 2013 Marek Goldmann <mgoldman@redhat.com> - 0.5-3
+- Add java bindings
+
 * Fri Sep  6 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-2
 - Made python-qpid-proton-doc a noarch package.
 - Resolves: BZ#1005058
