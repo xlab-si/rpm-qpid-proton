@@ -1,13 +1,15 @@
 %global proton_datadir %{_datadir}/proton-%{version}
 
 Name:           qpid-proton
-Version:        0.5
-Release:        2%{?dist}
+Version:        0.6
+Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
+
+Patch1: 01-PROTON-445-Dynamic-languages-honor-CMAKE_INSTALL_PRE.patch
 
 BuildRequires:  cmake >= 2.6
 BuildRequires:  swig
@@ -19,8 +21,6 @@ BuildRequires:  python-devel
 BuildRequires:  epydoc
 
 
-# BZ#1000620
-Patch1: 01-PROTON-412-Fix-the-include-and-lib-directories-in-li.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -30,8 +30,9 @@ standard. Using Proton it is trivial to integrate with the AMQP 1.0 ecosystem
 from any platform, environment, or language.
 
 
+
 %package -n qpid-proton-c
-Summary:   C librarys for Qpid Proton
+Summary:   C libraries for Qpid Proton
 Obsoletes: qpid-proton < %{version}-%{release}
 Provides:  qpid-proton = %{version}-%{release}
 
@@ -58,6 +59,7 @@ Provides:  qpid-proton = %{version}-%{release}
 %postun -n qpid-proton-c -p /sbin/ldconfig
 
 
+
 %package -n qpid-proton-c-devel
 Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
 Summary:   Development libraries for writing messaging apps with Qpid Proton
@@ -74,6 +76,8 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_includedir}/proton
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
+%{_datadir}/proton/examples
+
 
 
 %package -n qpid-proton-c-devel-doc
@@ -85,9 +89,7 @@ BuildArch: noarch
 
 %files -n qpid-proton-c-devel-doc
 %defattr(-,root,root,-)
-%{proton_datadir}/docs/api-c
-%{_datadir}/proton/examples
-
+%doc %{proton_datadir}/docs/api-c
 
 
 
@@ -96,7 +98,6 @@ Summary:  Python language bindings for the Qpid Proton messaging framework
 
 Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 Requires: python
-
 
 
 %description -n python-qpid-proton
@@ -110,6 +111,7 @@ Requires: python
 %{python_sitearch}/proton.*
 
 
+
 %package -n python-qpid-proton-doc
 Summary:   Documentation for the Python language bindings for Qpid Proton
 BuildArch: noarch
@@ -121,8 +123,7 @@ BuildArch: noarch
 
 %files -n python-qpid-proton-doc
 %defattr(-,root,root,-)
-%{proton_datadir}/docs
-
+%doc %{proton_datadir}/docs/api-py
 
 %prep
 %setup -q -n %{name}-%{version}
@@ -130,7 +131,10 @@ BuildArch: noarch
 %patch1 -p1
 
 %build
-%cmake -DPROTON_DISABLE_RPATH=true .
+%cmake \
+    -DPROTON_DISABLE_RPATH=true \
+    -DPYTHON_ARCHLIB_DIR=%{python_sitearch} \
+    .
 make all docs %{?_smp_mflags}
 
 
@@ -140,16 +144,18 @@ make all docs %{?_smp_mflags}
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
 
 # clean up files that are not shipped
-rm -rf %{buildroot}%{_libdir}/perl5
-rm -rf %{buildroot}%{_libdir}/php
+rm -rf %{buildroot}%{_exec_prefix}/bindings
 rm -rf %{buildroot}%{_libdir}/java
-rm -rf %{buildroot}%{_libdir}/ruby
 rm -rf %{buildroot}%{_libdir}/libproton-jni.so
-rm -rf %{buildroot}%{_datarootdir}/php
 rm -rf %{buildroot}%{_datarootdir}/java
-rm -rf %{buildroot}%{_sysconfdir}/php.d
+rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
+* Thu Jan 16 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-1
+- Rebased on Proton 0.6.
+- Update spec to delete ruby and perl5 directories if Cmake creates them.
+- Removed Java sub-packages - those will be packaged separate in future.
+
 * Fri Sep  6 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-2
 - Made python-qpid-proton-doc a noarch package.
 - Resolves: BZ#1005058
@@ -166,7 +172,7 @@ rm -rf %{buildroot}%{_sysconfdir}/php.d
 - Provide examples for qpid-proton-c
 - Resolves: BZ#975723
 
-* Fri Apr  4 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2.2
+* Fri Apr  5 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2.2
 - Added Obsoletes and Provides for packages whose names changed.
 - Resolves: BZ#948784
 

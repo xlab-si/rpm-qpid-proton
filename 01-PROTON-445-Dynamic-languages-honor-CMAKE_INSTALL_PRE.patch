@@ -1,0 +1,382 @@
+From 9b28009aa2cc117017ce03690ebaae73f17dbcf7 Mon Sep 17 00:00:00 2001
+From: "Darryl L. Pierce" <mcpierce@gmail.com>
+Date: Mon, 6 Jan 2014 14:00:21 -0500
+Subject: [PATCH] PROTON-445: Dynamic languages honor CMAKE_INSTALL_PREFIX
+
+All languages are installed to $CMAKE_INSTALL_PREFIX/bindings/$LANG by
+default.
+
+If the ASK_BINDINGS macro is set to 1 at the command line, then each
+language is interrogated as to the location of where they will be
+installed, and that path modified wit the install prefix.
+
+Individual languages can be told to interrogate for the install path
+with:
+
+  ASK_[LANG]=1
+---
+ CMakeLists.txt                          | 21 +++++++++++
+ README                                  | 28 +++++++++++++++
+ proton-c/bindings/perl/CMakeLists.txt   | 63 +++++++++++++++++----------------
+ proton-c/bindings/php/CMakeLists.txt    | 57 ++++++++++++++++-------------
+ proton-c/bindings/python/CMakeLists.txt | 23 +++++++-----
+ proton-c/bindings/ruby/CMakeLists.txt   | 44 ++++++++---------------
+ 6 files changed, 144 insertions(+), 92 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a41970a..5f567dd 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -69,6 +69,27 @@ set (SYSCONF_INSTALL_DIR etc CACHE PATH "System read only configuration director
+ set (SHARE_INSTALL_DIR share CACHE PATH "Shared read only data directory")
+ set (MAN_INSTALL_DIR share/man CACHE PATH "Manpage directory")
+ 
++## LANGUAGE BINDINGS
++#  If ASK_$LANG is 1 then the language is queried for the directory into which
++#  those language bindings are to be installed. If it is 0 then the bindings
++#  are installed to $CMAKE_INSTALL_PREFIX/bindings/$LANG
++#
++set (BINDINGS_DIR bindings CACHE PATH "Default directory for language bindings")
++set (ASK_PERL 0 CACHE INTEGER "Ask Perl for install directories")
++set (ASK_PHP 0 CACHE INTEGER "Ask PHP for install directories")
++set (ASK_PYTHON 0 CACHE INTEGER "Ask Python for install directories")
++set (ASK_RUBY 0 CACHE INTEGER "Ask Ruby for install directories")
++set (ASK_BINDINGS 0 CACHE INTEGER "If 1 then ask all languages for their directory")
++
++if (ASK_BINDINGS)
++  set (ASK_PERL 1)
++  set (ASK_PHP 1)
++  set (ASK_PYTHON 1)
++  set (ASK_RUBY 1)
++endif (ASK_BINDINGS)
++
++message(STATUS "PYTHON_ARCHLIB_DIR=${PYTHON_ARCHLIB_DIR}")
++
+ if (WIN32)
+   set (EXAMPLES_INSTALL_DIR proton/examples)
+ endif (WIN32)
+diff --git a/README b/README
+index eca7f08..b8e7ce7 100644
+--- a/README
++++ b/README
+@@ -100,6 +100,34 @@ For more on the use of DESTDIR, see the following:
+ 
+ http://www.gnu.org/prep/standards/html_node/DESTDIR.html
+ 
++== Specifying The Language Binding Install Directories ==
++
++Most dynamic languages provide a way for asking where to install libraries in
++order to place them in a default search path.
++
++By default, Proton installs all dynamic language bindings into a central,
++default location:
++
++  $CMAKE_INSTALL_PREFIX/bindings/$LANG
++
++In order to use these bindings, you'll need to modify any environment variable
++to include the appropriate directories. The environment variables to be set are:
++
++ * Perl   - Add the bindings/perl and bindings/perl/lib path to PERL5PATH
++ * PHP    - Set the PHPRC variable to point to bindings/php/ini/php.ini
++ * Python - Add the bindings/python path to PYTHONPATH
++ * Ruby   - Add the bindings/ruby and bindings/ruby/lib path to RUBYLIB
++
++You can tell any single language to install to the correct path for that
++language with:
++
++  cmake -DASK_[LANGUAGE]=1 .
++
++where [LANGUAGE] is one of: PERL, PHP, PYTHON or RUBY. To tell the build system
++to ask ALL languages, use:
++
++  cmake -DASK_BINDINGS=1 .
++
+ == Disable Building The Language Bindings ==
+ 
+ To disable any language bindings, you can disable them individually with:
+diff --git a/proton-c/bindings/perl/CMakeLists.txt b/proton-c/bindings/perl/CMakeLists.txt
+index 3f16436..158fdc6 100644
+--- a/proton-c/bindings/perl/CMakeLists.txt
++++ b/proton-c/bindings/perl/CMakeLists.txt
+@@ -22,15 +22,29 @@ include_directories("${PERL_INCLUDE_PATH}")
+ # Need to pass in the same compiler flags used to build Perl itself
+ execute_process(COMMAND perl -MConfig -e "print \$Config{ccflags}"
+                 OUTPUT_VARIABLE PERLCFLAGS)
+-if (NOT PERL_VENDORLIB)
++
++if (ASK_PERL)
++
+   execute_process(COMMAND perl -V:installvendorlib
+-                  OUTPUT_VARIABLE PERL_VENDORLIB_OUTPUT_VARIABLE
+-                  RESULT_VARIABLE PERL_VENDORLIB_RESULT_VARIABLE)
+-  if (NOT PERL_VENDORLIB_RESULT_VARIABLE)
+-      string(REGEX REPLACE "install[a-z]+='([^']+)'.*" "\\1" PERL_VENDORLIB ${PERL_VENDORLIB_OUTPUT_VARIABLE})
+-      file(TO_CMAKE_PATH "${PERL_VENDORLIB}" PERL_VENDORLIB)
+-  endif (NOT PERL_VENDORLIB_RESULT_VARIABLE)
+-endif (NOT PERL_VENDORLIB)
++    OUTPUT_VARIABLE PERL_ARCHLIB_OUTPUT_VARIABLE
++    RESULT_VARIABLE PERL_ARCHLIB_RESULT_VARIABLE)
++  if (NOT PERL_ARCHLIB_RESULT_VARIABLE)
++    string(REGEX REPLACE "install[a-z]+='([^']+)'.*" "\\1" PERL_ARCHLIB ${PERL_ARCHLIB_OUTPUT_VARIABLE})
++    file(TO_CMAKE_PATH "${PERL_ARCHLIB}" PERL_ARCHLIB_DIR)
++  endif (NOT PERL_ARCHLIB_RESULT_VARIABLE)
++
++  execute_process(COMMAND perl -V:installsitelib
++    OUTPUT_VARIABLE PERL_SITELIB_OUTPUT_VARIABLE
++    RESULT_VARIABLE PERL_SITELIB_RESULT_VARIABLE)
++  if (NOT PERL_SITELIB_RESULT_VARIABLE)
++    string(REGEX REPLACE "install[a-z]+='([^']+)'.*" "\\1" PERL_SITELIB ${PERL_SITELIB_OUTPUT_VARIABLE})
++    file(TO_CMAKE_PATH "${PERL_SITELIB}" PERL_SITELIB_DIR)
++  endif (NOT PERL_SITELIB_RESULT_VARIABLE)
++
++else (ASK_PERL)
++  set (PERL_ARCHLIB_DIR ${BINDINGS_DIR}/perl/lib${LIB_SUFFIX} CACHE PATH "Perl platform code")
++  set (PERL_SITELIB_DIR ${BINDINGS_DIR}/perl/ CACHE PATH "Perl code")
++endif (ASK_PERL)
+ 
+ set (CMAKE_C_FLAGS ${PERLCFLAGS})
+ 
+@@ -39,45 +53,32 @@ swig_link_libraries(cproton_perl ${BINDING_DEPS} ${PERL_LIBRARY})
+ 
+ if ((${CMAKE_MAJOR_VERSION} EQUAL 2) AND (${CMAKE_MINOR_VERSION} LESS 8))
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cproton_perl.so
+-        DESTINATION ${PERL_ARCHLIB}
++        DESTINATION ${PERL_ARCHLIB_DIR}
+         COMPONENT ${QPID_COMPONENT_CLIENT}
+         )
+ else()
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproton_perl.so
+         RENAME cproton_perl.so
+-        DESTINATION ${PERL_ARCHLIB}
++        DESTINATION ${PERL_ARCHLIB_DIR}
+         COMPONENT ${QPID_COMPONENT_CLIENT}
+         )
+ endif ((${CMAKE_MAJOR_VERSION} EQUAL 2) AND (${CMAKE_MINOR_VERSION} LESS 8))
+ 
+-set(PERL_LIBRARIES
+-    lib/qpid/proton/array_helper.pm
+-    lib/qpid/proton/Constants.pm
+-    lib/qpid/proton/Data.pm
+-    lib/qpid/proton/Mapping.pm
+-    lib/qpid/proton/Message.pm
+-    lib/qpid/proton/Messenger.pm
+-)
+-
+ # get the perl vendor library if it's not already defined
+-#if (NOT PERL_VENDORLIB)
++#if (NOT PERL_ARCHLIB)
+ #  execute_process(COMMAND ${PERL_EXECUTABLE} "-V:installvendorlib"
+-#                  OUTPUT_VARIABLE PERL_VENDORLIB_OUTPUT_VARIABLE
+-#                  RESULT_VARIABLE PERL_VENDORLIB_RESULT_VARIABLE)
+-#endif (!DEFINED PERL_VENDORLIB)
++#                  OUTPUT_VARIABLE PERL_ARCHLIB_OUTPUT_VARIABLE
++#                  RESULT_VARIABLE PERL_ARCHLIB_RESULT_VARIABLE)
++#endif (!DEFINED PERL_ARCHLIB)
+ 
+ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cproton_perl.pm
+-        DESTINATION ${PERL_ARCHLIB}
++        DESTINATION ${PERL_ARCHLIB_DIR}
+         COMPONENT Perl)
+ 
+ install(FILES lib/qpid_proton.pm
+-        DESTINATION ${PERL_VENDORLIB}
+-        COMPONENT Perl)
+-
+-INSTALL(FILES lib/qpid/proton.pm
+-        DESTINATION ${PERL_VENDORLIB}/qpid
++        DESTINATION ${PERL_SITELIB_DIR}
+         COMPONENT Perl)
+ 
+-INSTALL(FILES ${PERL_LIBRARIES}
+-        DESTINATION ${PERL_VENDORLIB}/qpid/proton
++INSTALL(DIRECTORY lib/qpid
++        DESTINATION ${PERL_SITELIB_DIR}
+         COMPONENT Perl)
+diff --git a/proton-c/bindings/php/CMakeLists.txt b/proton-c/bindings/php/CMakeLists.txt
+index d64d568..9b6ee2c 100644
+--- a/proton-c/bindings/php/CMakeLists.txt
++++ b/proton-c/bindings/php/CMakeLists.txt
+@@ -39,35 +39,44 @@ set_target_properties(cproton
+     PREFIX ""
+     LINK_FLAGS "${ALLOW_UNDEFINED}")
+ 
+-execute_process(COMMAND ${PHP_CONFIG_EXE} --extension-dir
+-                OUTPUT_VARIABLE PHP_EXT_DIR_DEFAULT
+-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+-execute_process(COMMAND ${PHP_CONFIG_EXE} --prefix
+-                OUTPUT_VARIABLE QPHP_PREFIX
+-                OUTPUT_STRIP_TRAILING_WHITESPACE)
+-execute_process(COMMAND ${PHP_CONFIG_EXE} --config-options
+-                OUTPUT_VARIABLE PHP_OPTS
+-                OUTPUT_STRIP_TRAILING_WHITESPACE)
++if (ASK_PHP)
++  execute_process(COMMAND ${PHP_CONFIG_EXE} --extension-dir
++    OUTPUT_VARIABLE PHP_EXT_DIR_DEFAULT
++    OUTPUT_STRIP_TRAILING_WHITESPACE)
++  execute_process(COMMAND ${PHP_CONFIG_EXE} --prefix
++    OUTPUT_VARIABLE QPHP_PREFIX
++    OUTPUT_STRIP_TRAILING_WHITESPACE)
++  execute_process(COMMAND ${PHP_CONFIG_EXE} --config-options
++    OUTPUT_VARIABLE PHP_OPTS
++    OUTPUT_STRIP_TRAILING_WHITESPACE)
+ 
+-set(GET_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/get_include_dir.php)
+-execute_process(COMMAND ${PHP_EXE} -n ${GET_INCLUDE_DIR} ${QPHP_PREFIX}
+-                OUTPUT_VARIABLE PHP_INCLUDE_DIR_DEFAULT
+-                OUTPUT_STRIP_TRAILING_WHITESPACE)
++  set(GET_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/get_include_dir.php)
++  execute_process(COMMAND ${PHP_EXE} -n ${GET_INCLUDE_DIR} ${QPHP_PREFIX}
++    OUTPUT_VARIABLE PHP_INCLUDE_DIR_DEFAULT
++    OUTPUT_STRIP_TRAILING_WHITESPACE)
++
++  if ("${PHP_INCLUDE_DIR_DEFAULT}" STREQUAL "")
++    set(PHP_INCLUDE_DIR_DEFAULT "/usr/share/php")
++  endif()
++
++  string(REGEX MATCH "--with-config-file-scan-dir=([^ ]*)" PHP_OPT_MATCH ${PHP_OPTS})
++  set (PHP_INI_DIR_DEFAULT ${CMAKE_MATCH_1})
++
++  if ("${PHP_INI_DIR_DEFAULT}" STREQUAL "")
++    set(PHP_INI_DIR_DEFAULT "/etc/php.d")
++  endif()
+ 
+-if ("${PHP_INCLUDE_DIR_DEFAULT}" STREQUAL "")
+-  set(PHP_INCLUDE_DIR_DEFAULT "/usr/share/php")
+-endif()
++  set(PHP_EXT_DIR ${PHP_EXT_DIR_DEFAULT} CACHE PATH "PHP extensions directory.")
++  set(PHP_INI_DIR ${PHP_INI_DIR_DEFAULT} CACHE PATH "Directory scanned for PHP ini files.")
++  set(PHP_INCLUDE_DIR ${PHP_INCLUDE_DIR_DEFAULT} CACHE PATH "PHP include directory.")
+ 
+-string(REGEX MATCH "--with-config-file-scan-dir=([^ ]*)" PHP_OPT_MATCH ${PHP_OPTS})
+-set (PHP_INI_DIR_DEFAULT ${CMAKE_MATCH_1})
++else (ASK_PHP)
+ 
+-if ("${PHP_INI_DIR_DEFAULT}" STREQUAL "")
+-  set(PHP_INI_DIR_DEFAULT "/etc/php.d")
+-endif()
++  set (PHP_EXT_DIR ${BINDINGS_DIR}/php CACHE PATH "PHP extensions directory")
++  set (PHP_INCLUDE_DIR ${BINDINGS_DIR}/php/include CACHE PATH "PHP include directory")
++  set (PHP_INI_DIR ${BINDINGS_DIR}/php/ini CACHE PATH "PHP ini directory")
+ 
+-set(PHP_EXT_DIR ${PHP_EXT_DIR_DEFAULT} CACHE PATH "PHP extensions directory.")
+-set(PHP_INI_DIR ${PHP_INI_DIR_DEFAULT} CACHE PATH "Directory scanned for PHP ini files.")
+-set(PHP_INCLUDE_DIR ${PHP_INCLUDE_DIR_DEFAULT} CACHE PATH "PHP include directory.")
++endif (ASK_PHP)
+ 
+ install(TARGETS cproton
+         DESTINATION ${PHP_EXT_DIR}
+diff --git a/proton-c/bindings/python/CMakeLists.txt b/proton-c/bindings/python/CMakeLists.txt
+index a61277a..b63b6fd 100644
+--- a/proton-c/bindings/python/CMakeLists.txt
++++ b/proton-c/bindings/python/CMakeLists.txt
+@@ -30,12 +30,19 @@ set_target_properties(_cproton
+ 
+ find_package(PythonInterp REQUIRED)
+ 
+-if (NOT PYTHON_SITEARCH_PACKAGES)
+-   execute_process(COMMAND ${PYTHON_EXECUTABLE}
+-                           -c "from distutils.sysconfig import get_python_lib; print get_python_lib(True)"
+-                           OUTPUT_VARIABLE PYTHON_SITEARCH_PACKAGES
+-                           OUTPUT_STRIP_TRAILING_WHITESPACE)
+-endif ()
++if (ASK_PYTHON)
++
++  if (NOT PYTHON_SITEARCH_PACKAGES)
++    execute_process(COMMAND ${PYTHON_EXECUTABLE}
++      -c "from distutils.sysconfig import get_python_lib; print get_python_lib(True)"
++      OUTPUT_VARIABLE PYTHON_ARCHLIB_DIR
++      OUTPUT_STRIP_TRAILING_WHITESPACE)
++  else (NOT PYTHON_SITEARCH_PACKAGES)
++    set (PYTHON_ARCHLIB_DIR "${PYTHON_SITEARCH_PACKAGES}")
++  endif ()
++else (ASK_PYTHON)
++  set (PYTHON_ARCHLIB_DIR ${BINDINGS_DIR}/python/lib${LIB_SUFFIX} CACHE PATH "Python platform code")
++endif (ASK_PYTHON)
+ 
+ install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -m py_compile cproton.py
+                               WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})")
+@@ -64,8 +71,8 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cproton.py
+               ${CMAKE_CURRENT_SOURCE_DIR}/proton.py
+               ${CMAKE_CURRENT_SOURCE_DIR}/proton.pyc
+               ${CMAKE_CURRENT_SOURCE_DIR}/proton.pyo
+-        DESTINATION ${PYTHON_SITEARCH_PACKAGES}
++        DESTINATION ${PYTHON_ARCHLIB_DIR}
+         COMPONENT Python)
+ install(TARGETS _cproton
+-        DESTINATION ${PYTHON_SITEARCH_PACKAGES}
++        DESTINATION ${PYTHON_ARCHLIB_DIR}
+         COMPONENT Python)
+diff --git a/proton-c/bindings/ruby/CMakeLists.txt b/proton-c/bindings/ruby/CMakeLists.txt
+index 4d62819..5768907 100644
+--- a/proton-c/bindings/ruby/CMakeLists.txt
++++ b/proton-c/bindings/ruby/CMakeLists.txt
+@@ -26,38 +26,16 @@ set_target_properties(cproton-ruby
+     OUTPUT_NAME "cproton"
+     LINK_FLAGS "${CATCH_UNDEFINED}" )
+ 
+-install(TARGETS cproton-ruby
+-        DESTINATION ${RUBY_ARCH_DIR}
+-        COMPONENT Ruby)
+-
+-# Install the Ruby libraries
+-set(RUBY_LIBRARIES
+-    lib/qpid_proton/array.rb
+-    lib/qpid_proton/data.rb
+-    lib/qpid_proton/described.rb
+-    lib/qpid_proton/exception_handling.rb
+-    lib/qpid_proton/exceptions.rb
+-    lib/qpid_proton/hash.rb
+-    lib/qpid_proton/mapping.rb
+-    lib/qpid_proton/message_format.rb
+-    lib/qpid_proton/message.rb
+-    lib/qpid_proton/messenger.rb
+-    lib/qpid_proton/subscription.rb
+-    lib/qpid_proton/tracker.rb
+-    lib/qpid_proton/tracker_status.rb
+-)
++if (ASK_RUBY)
+ 
+-set(RUBY_ARCHLIB_DIR "${RUBY_VENDORLIB_DIR}")
+-
+-if (NOT RUBY_ARCHLIB_DIR)
+   execute_process(COMMAND ${RUBY_EXECUTABLE}
+-                  -r rbconfig -e "print RbConfig::CONFIG['vendorarchdir'] || ''"
++    -r rbconfig -e "print RbConfig::CONFIG['vendorarchdir'] || ''"
+     RESULT_VARIABLE RESULT_RUBY_ARCHLIB_DIR
+     OUTPUT_VARIABLE OUTPUT_RUBY_ARCHLIB_DIR)
+ 
+   if(OUTPUT_RUBY_ARCHLIB_DIR STREQUAL "")
+     execute_process(COMMAND ${RUBY_EXECUTABLE}
+-                    -r rbconfig -e "print RbConfig::CONFIG['sitearchdir'] || ''"
++      -r rbconfig -e "print RbConfig::CONFIG['archdir'] || ''"
+       RESULT_VARIABLE RESULT_RUBY_ARCHLIB_DIR
+       OUTPUT_VARIABLE OUTPUT_RUBY_ARCHLIB_DIR)
+ 
+@@ -65,12 +43,20 @@ if (NOT RUBY_ARCHLIB_DIR)
+ 
+   set(RUBY_ARCHLIB_DIR "${OUTPUT_RUBY_ARCHLIB_DIR}")
+ 
+-endif ()
++else (ASK_RUBY)
++
++  set (RUBY_SITELIB_DIR ${BINDINGS_DIR}/ruby CACHE PATH "Ruby portable code")
++  set (RUBY_ARCHLIB_DIR ${BINDINGS_DIR}/ruby/lib${LIB_SUFFIX} CACHE PATH "Ruby platform code")
++
++endif (ASK_RUBY)
+ 
++
++install(TARGETS cproton-ruby
++        DESTINATION ${RUBY_ARCHLIB_DIR}
++        COMPONENT Ruby)
+ install(FILES lib/qpid_proton.rb
+         DESTINATION ${RUBY_ARCHLIB_DIR}
+         COMPONENT Ruby)
+-
+-install(FILES ${RUBY_LIBRARIES}
+-        DESTINATION ${RUBY_ARCHLIB_DIR}/qpid_proton
++install(DIRECTORY lib/qpid_proton
++        DESTINATION ${RUBY_ARCHLIB_DIR}
+         COMPONENT Ruby)
+-- 
+1.8.4.2
+
