@@ -1,0 +1,34 @@
+From 8dbabe96f2363893b83ac0bc4fa124bca0e46bf4 Mon Sep 17 00:00:00 2001
+From: "Darryl L. Pierce" <mcpierce@gmail.com>
+Date: Thu, 19 Dec 2013 09:47:57 -0500
+Subject: [PATCH] PROTON-482: Fix the Ruby install directory.
+
+Use vendorarchdir rather than vendorlibdir.
+---
+ proton-c/bindings/ruby/CMakeLists.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/proton-c/bindings/ruby/CMakeLists.txt b/proton-c/bindings/ruby/CMakeLists.txt
+index 65c71f1..4d62819 100644
+--- a/proton-c/bindings/ruby/CMakeLists.txt
++++ b/proton-c/bindings/ruby/CMakeLists.txt
+@@ -51,13 +51,13 @@ set(RUBY_ARCHLIB_DIR "${RUBY_VENDORLIB_DIR}")
+ 
+ if (NOT RUBY_ARCHLIB_DIR)
+   execute_process(COMMAND ${RUBY_EXECUTABLE}
+-                  -r rbconfig -e "print RbConfig::CONFIG['vendorlibdir']"
++                  -r rbconfig -e "print RbConfig::CONFIG['vendorarchdir'] || ''"
+     RESULT_VARIABLE RESULT_RUBY_ARCHLIB_DIR
+     OUTPUT_VARIABLE OUTPUT_RUBY_ARCHLIB_DIR)
+ 
+-  if(NOT RESULT_RUBY_ARCHLIB_DIR AND OUTPUT_RUBY_ARCHLIB_DIR )
++  if(OUTPUT_RUBY_ARCHLIB_DIR STREQUAL "")
+     execute_process(COMMAND ${RUBY_EXECUTABLE}
+-                    -r rbconfig -e "print RbConfig::CONFIG['sitearchdir']"
++                    -r rbconfig -e "print RbConfig::CONFIG['sitearchdir'] || ''"
+       RESULT_VARIABLE RESULT_RUBY_ARCHLIB_DIR
+       OUTPUT_VARIABLE OUTPUT_RUBY_ARCHLIB_DIR)
+ 
+-- 
+1.8.3.1
+
