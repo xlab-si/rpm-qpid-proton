@@ -2,21 +2,31 @@
 
 Name:           qpid-proton
 Version:        0.6
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
-Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
 
-BuildRequires:  cmake28
+Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
 Patch1: 01-PROTON-445-Dynamic-languages-honor-CMAKE_INSTALL_PRE.patch
+
+%if (0%{?fedora} || 0%{?rhel} == 7)
+BuildRequires:  cmake >= 2.6
+%global cmake_exe %{cmake}
+%endif
+
+%if 0%{?rhel} == 6
+BuildRequires: cmake28
+%global cmake_exe %{cmake28}
+%endif
 
 BuildRequires:  swig
 BuildRequires:  pkgconfig
 BuildRequires:  doxygen
 BuildRequires:  libuuid-devel
 BuildRequires:  openssl-devel
+BuildRequires:  python
 BuildRequires:  python-devel
 BuildRequires:  epydoc
 
@@ -29,19 +39,19 @@ routers, bridges, proxies, and more. Proton is based on the AMQP 1.0 messaging
 standard. Using Proton it is trivial to integrate with the AMQP 1.0 ecosystem
 from any platform, environment, or language.
 
+# === qpid-proton-c
 
-
-%package -n qpid-proton-c
+%package c
 Summary:   C libraries for Qpid Proton
 Obsoletes: qpid-proton < %{version}-%{release}
 Provides:  qpid-proton = %{version}-%{release}
 
 
-%description -n qpid-proton-c
+%description c
 %{summary}.
 
 
-%files -n qpid-proton-c
+%files c
 %defattr(-,root,root,-)
 %dir %{proton_datadir}
 %doc %{proton_datadir}/LICENSE
@@ -53,45 +63,44 @@ Provides:  qpid-proton = %{version}-%{release}
 %{_libdir}/libqpid-proton.so.*
 
 
-%post -n qpid-proton-c -p /sbin/ldconfig
+%post c -p /sbin/ldconfig
 
+%postun c -p /sbin/ldconfig
 
-%postun -n qpid-proton-c -p /sbin/ldconfig
+# === qpid-proton-c-devel
 
-
-
-%package -n qpid-proton-c-devel
+%package c-devel
 Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
 Summary:   Development libraries for writing messaging apps with Qpid Proton
 Obsoletes: qpid-proton-devel < %{version}-%{release}
 Provides:  qpid-proton-devel = %{version}-%{release}
 
 
-%description -n qpid-proton-c-devel
+%description c-devel
 %{summary}.
 
 
-%files -n qpid-proton-c-devel
+%files c-devel
 %defattr(-,root,root,-)
 %{_includedir}/proton
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
 %{_datadir}/proton/examples
 
+# === qpid-proton-c-devel-doc
 
-
-%package -n qpid-proton-c-devel-doc
+%package c-devel-doc
 Summary:   Documentation for the C development libraries for Qpid Proton
 BuildArch: noarch
 
-%description -n qpid-proton-c-devel-doc
+%description c-devel-doc
 %{summary}.
 
-%files -n qpid-proton-c-devel-doc
+%files c-devel-doc
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-c
 
-
+# === python-qpid-proton
 
 %package -n python-qpid-proton
 Summary:  Python language bindings for the Qpid Proton messaging framework
@@ -110,7 +119,7 @@ Requires: python
 %{python_sitearch}/cproton.*
 %{python_sitearch}/proton.*
 
-
+# === python-qpid-proton-doc
 
 %package -n python-qpid-proton-doc
 Summary:   Documentation for the Python language bindings for Qpid Proton
@@ -131,7 +140,8 @@ BuildArch: noarch
 %patch1 -p1
 
 %build
-%cmake28 \
+
+%cmake_exe \
     -DPROTON_DISABLE_RPATH=true \
     -DPYTHON_ARCHLIB_DIR=%{python_sitearch} \
     .
@@ -144,20 +154,21 @@ make all docs %{?_smp_mflags}
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
 
 # clean up files that are not shipped
-rm -rf %{buildroot}%{_libdir}/perl5
-rm -rf %{buildroot}%{_libdir}/php
+rm -rf %{buildroot}%{_exec_prefix}/bindings
 rm -rf %{buildroot}%{_libdir}/java
-rm -rf %{buildroot}%{_libdir}/ruby
 rm -rf %{buildroot}%{_libdir}/libproton-jni.so
-rm -rf %{buildroot}%{_datarootdir}/php
 rm -rf %{buildroot}%{_datarootdir}/java
-rm -rf %{buildroot}%{_sysconfdir}/php.d
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
-* Tue Jan 28 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-1
+* Mon Feb 24 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-2
+- Reorganized the subpackages.
+- Merged up branches to get things back into sync.
+
+* Thu Jan 16 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-1
 - Rebased on Proton 0.6.
 - Update spec to delete ruby and perl5 directories if Cmake creates them.
+- Removed Java sub-packages - those will be packaged separate in future.
 
 * Fri Sep  6 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.5-2
 - Made python-qpid-proton-doc a noarch package.
@@ -167,12 +178,9 @@ rm -rf %{buildroot}%{_libdir}/proton.cmake
 - Rebased on Proton 0.5.
 - Resolves: BZ#1000620
 
-* Mon Aug 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-5
+* Mon Aug 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-4
 - Created the qpid-proton-c-devel-doc subpackage.
 - Resolves: BZ#1000615
-
-* Sun Aug 04 2013 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.4-4
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_20_Mass_Rebuild
 
 * Wed Jul 24 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-3
 - Provide examples for qpid-proton-c
@@ -188,9 +196,8 @@ rm -rf %{buildroot}%{_libdir}/proton.cmake
 * Thu Mar 28 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-2
 - Moved all C libraries to the new qpid-proton-c subpackage.
 
-* Wed Mar 13 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-1
+* Tue Feb 26 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.4-1
 - Rebased on Proton 0.4.
-- On EL6 BR pulls in Cmake 2.8 on PPC/PPC64.
 
 * Thu Feb 21 2013 Darryl L. Pierce <dpierce@redhat.com> - 0.3-4
 - Fixes copying nested data.
