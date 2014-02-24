@@ -103,20 +103,6 @@ BuildArch: noarch
 
 # === python-qpid-proton
 
-
-%package -n qpid-proton-c-devel-doc
-Summary:   Documentation for the C development libraries for Qpid Proton
-BuildArch: noarch
-
-%description -n qpid-proton-c-devel-doc
-%{summary}.
-
-%files -n qpid-proton-c-devel-doc
-%defattr(-,root,root,-)
-%doc %{proton_datadir}/docs/api-c
-
-
-
 %package -n python-qpid-proton
 Summary:  Python language bindings for the Qpid Proton messaging framework
 
@@ -179,8 +165,9 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
-* Thu Feb 24 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-2
+* Mon Feb 24 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-2
 - Reorganized the subpackages.
+- Merged up branches to get things back into sync.
 
 * Thu Jan 16 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-1
 - Rebased on Proton 0.6.
