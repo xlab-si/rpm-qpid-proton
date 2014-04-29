@@ -1,15 +1,14 @@
 %global proton_datadir %{_datadir}/proton-%{version}
 
 Name:           qpid-proton
-Version:        0.6
-Release:        2%{?dist}
+Version:        0.7
+Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 
 Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
-Patch1: 01-PROTON-445-Dynamic-languages-honor-CMAKE_INSTALL_PRE.patch
 
 %if (0%{?fedora} || 0%{?rhel} == 7)
 BuildRequires:  cmake >= 2.6
@@ -85,6 +84,7 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_includedir}/proton
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
+%{_libdir}/cmake/Proton
 %{_datadir}/proton/examples
 
 # === qpid-proton-c-devel-doc
@@ -137,13 +137,15 @@ BuildArch: noarch
 %prep
 %setup -q -n %{name}-%{version}
 
-%patch1 -p1
 
 %build
 
 %cmake_exe \
     -DPROTON_DISABLE_RPATH=true \
-    -DPYTHON_ARCHLIB_DIR=%{python_sitearch} \
+    -DPYTHON_SITEARCH_PACKAGES=%{python_sitearch} \
+    -DNOBUILD_RUBY=1 \
+    -DNOBUILD_PERL=1 \
+    -DNOBUILD_PHP=1 \
     .
 make all docs %{?_smp_mflags}
 
@@ -161,6 +163,10 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
+* Tue Apr 29 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.7-1
+- Rebased on Proton 0.7
+- Added new CMake modules for Proton to qpid-proton-c-devel.
+
 * Mon Feb 24 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.6-2
 - Reorganized the subpackages.
 - Merged up branches to get things back into sync.
