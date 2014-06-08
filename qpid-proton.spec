@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.7
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -163,6 +163,9 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
+* Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Tue Apr 29 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.7-1
 - Rebased on Proton 0.7
 - Added new CMake modules for Proton to qpid-proton-c-devel.
