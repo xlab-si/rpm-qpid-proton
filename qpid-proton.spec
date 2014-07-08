@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.7
-Release:        1%{?dist}
+Release:        3%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -38,7 +38,7 @@ routers, bridges, proxies, and more. Proton is based on the AMQP 1.0 messaging
 standard. Using Proton it is trivial to integrate with the AMQP 1.0 ecosystem
 from any platform, environment, or language.
 
-# === qpid-proton-c
+
 
 %package c
 Summary:   C libraries for Qpid Proton
@@ -66,7 +66,7 @@ Provides:  qpid-proton = %{version}-%{release}
 
 %postun c -p /sbin/ldconfig
 
-# === qpid-proton-c-devel
+
 
 %package c-devel
 Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
@@ -87,7 +87,7 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_libdir}/cmake/Proton
 %{_datadir}/proton/examples
 
-# === qpid-proton-c-devel-doc
+
 
 %package c-devel-doc
 Summary:   Documentation for the C development libraries for Qpid Proton
@@ -100,7 +100,7 @@ BuildArch: noarch
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-c
 
-# === python-qpid-proton
+
 
 %package -n python-qpid-proton
 Summary:  Python language bindings for the Qpid Proton messaging framework
@@ -119,7 +119,7 @@ Requires: python
 %{python_sitearch}/cproton.*
 %{python_sitearch}/proton.*
 
-# === python-qpid-proton-doc
+
 
 %package -n python-qpid-proton-doc
 Summary:   Documentation for the Python language bindings for Qpid Proton
@@ -163,6 +163,12 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
+* Tue Jul  8 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.7-3
+- Removed intra-package comments which cause error messages on package uninstall.
+
+* Sun Jun 08 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7-2
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_Mass_Rebuild
+
 * Tue Apr 29 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.7-1
 - Rebased on Proton 0.7
 - Added new CMake modules for Proton to qpid-proton-c-devel.
