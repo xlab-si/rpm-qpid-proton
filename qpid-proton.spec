@@ -2,7 +2,7 @@
 
 Name:           qpid-proton
 Version:        0.7
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -163,6 +163,9 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
+* Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7-4
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
+
 * Tue Jul  8 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.7-3
 - Removed intra-package comments which cause error messages on package uninstall.
 
