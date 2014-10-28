@@ -1,0 +1,40 @@
+From a0670dd53c9d3b444656917e0b663364f6f20aa5 Mon Sep 17 00:00:00 2001
+From: "Darryl L. Pierce" <mcpierce@gmail.com>
+Date: Mon, 27 Oct 2014 15:01:52 -0400
+Subject: [PATCH] PROTON-731: Installing Python requires Proton be installed
+ already.
+
+The CHECK_SYSINSTALL_PYTHON variable was not being set, so it's now
+being set by default but can be overridden from the command line.
+
+Also changed the PYTHON_SITEARCH_PACKAGES variable a cache done that can
+also be overridden from the command line as well.
+---
+ proton-c/bindings/python/CMakeLists.txt | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/proton-c/bindings/python/CMakeLists.txt b/proton-c/bindings/python/CMakeLists.txt
+index b8cdb57..ff8c706 100644
+--- a/proton-c/bindings/python/CMakeLists.txt
++++ b/proton-c/bindings/python/CMakeLists.txt
+@@ -22,6 +22,8 @@
+ 
+ set(CMAKE_SWIG_FLAGS "-threads")
+ 
++set(CHECK_SYSINSTALL_PYTHON ON CACHE INTERNAL "")
++
+ include_directories (${PYTHON_INCLUDE_PATH})
+ if (BUILD_WITH_CXX)
+    SET_SOURCE_FILES_PROPERTIES(cproton.i PROPERTIES CPLUSPLUS ON)
+@@ -74,7 +76,7 @@ if (CHECK_SYSINSTALL_PYTHON)
+ 
+ else ()
+   # install the bindings using the CMAKE path variables:
+-  set (PYTHON_SITEARCH_PACKAGES ${BINDINGS_DIR}/python)
++  set (PYTHON_SITEARCH_PACKAGES ${BINDINGS_DIR}/python CACHE INTERNAL "")
+ 
+   install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} -m py_compile cproton.py
+                                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})")
+-- 
+1.9.3
+

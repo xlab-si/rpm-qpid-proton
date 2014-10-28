@@ -1,14 +1,15 @@
 %global proton_datadir %{_datadir}/proton-%{version}
 
 Name:           qpid-proton
-Version:        0.7
-Release:        4%{?dist}
+Version:        0.8
+Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 
 Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
+Patch0001:      0001-PROTON-731-Installing-Python-requires-Proton-be-inst.patch
 
 %if (0%{?fedora} || 0%{?rhel} == 7)
 BuildRequires:  cmake >= 2.6
@@ -134,8 +135,12 @@ BuildArch: noarch
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-py
 
+
+
 %prep
 %setup -q -n %{name}-%{version}
+
+%patch0001 -p1
 
 
 %build
@@ -144,8 +149,10 @@ BuildArch: noarch
     -DPROTON_DISABLE_RPATH=true \
     -DPYTHON_SITEARCH_PACKAGES=%{python_sitearch} \
     -DNOBUILD_RUBY=1 \
-    -DNOBUILD_PERL=1 \
     -DNOBUILD_PHP=1 \
+    -DSYSINSTALL_PYTHON=1 \
+    -DSYSINSTALL_PERL=0 \
+    -DCHECK_SYSINSTALL_PYTHON=0 \
     .
 make all docs %{?_smp_mflags}
 
@@ -163,6 +170,9 @@ rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
 %changelog
+* Tue Nov 18 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.8-1
+- Rebased on Proton 0.8.
+
 * Sun Aug 17 2014 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.7-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_21_22_Mass_Rebuild
 
