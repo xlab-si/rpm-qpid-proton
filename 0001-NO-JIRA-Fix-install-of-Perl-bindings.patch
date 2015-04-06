@@ -1,0 +1,32 @@
+From fc37fa00539906cac2f0639c166fb233e826fe7e Mon Sep 17 00:00:00 2001
+From: "Darryl L. Pierce" <mcpierce@gmail.com>
+Date: Mon, 16 Mar 2015 09:15:22 -0400
+Subject: [PATCH 1/2] NO-JIRA: Fix install of Perl bindings
+
+---
+ proton-c/bindings/perl/CMakeLists.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/proton-c/bindings/perl/CMakeLists.txt b/proton-c/bindings/perl/CMakeLists.txt
+index 9891c09..55cf032 100644
+--- a/proton-c/bindings/perl/CMakeLists.txt
++++ b/proton-c/bindings/perl/CMakeLists.txt
+@@ -56,13 +56,13 @@ swig_link_libraries(cproton_perl ${BINDING_DEPS} ${PERL_LIBRARY})
+ 
+ if ((${CMAKE_MAJOR_VERSION} EQUAL 2) AND (${CMAKE_MINOR_VERSION} LESS 8))
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cproton_perl.so
+-        DESTINATION ${PERL_VENDORARCH_DIR}
++        DESTINATION ${PERL_VENDORARCH_DIR}/auto/cproton_perl
+         COMPONENT Perl
+         )
+ else()
+   install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libcproton_perl.so
+         RENAME cproton_perl.so
+-        DESTINATION ${PERL_VENDORARCH_DIR}
++        DESTINATION ${PERL_VENDORARCH_DIR}/auto/cproton_perl
+         COMPONENT Perl
+         )
+ endif ((${CMAKE_MAJOR_VERSION} EQUAL 2) AND (${CMAKE_MINOR_VERSION} LESS 8))
+-- 
+2.1.0
+

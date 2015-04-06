@@ -1,7 +1,8 @@
 %global proton_datadir %{_datadir}/proton-%{version}
+%global gem_name qpid_proton
 
 Name:           qpid-proton
-Version:        0.8
+Version:        0.9
 Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
@@ -9,7 +10,8 @@ License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 
 Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
-Patch0001:      0001-PROTON-731-Installing-Python-requires-Proton-be-inst.patch
+Patch0001:      0001-NO-JIRA-Fix-install-of-Perl-bindings.patch
+Patch0002:      0002-PROTON-582-Added-in-missing-is_float-method-to-Perl-.patch
 
 %if (0%{?fedora} || 0%{?rhel} == 7)
 BuildRequires:  cmake >= 2.6
@@ -29,6 +31,9 @@ BuildRequires:  openssl-devel
 BuildRequires:  python
 BuildRequires:  python-devel
 BuildRequires:  epydoc
+BuildRequires:  perl(ExtUtils::MakeMaker)
+BuildRequires:  perl(Test::Exception)
+BuildRequires:  perl(Test::More)
 
 
 
@@ -58,7 +63,6 @@ Provides:  qpid-proton = %{version}-%{release}
 %doc %{proton_datadir}/README
 %doc %{proton_datadir}/TODO
 %{_mandir}/man1/*
-%{_bindir}/proton
 %{_bindir}/proton-dump
 %{_libdir}/libqpid-proton.so.*
 
@@ -86,7 +90,7 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
 %{_libdir}/cmake/Proton
-%{_datadir}/proton/examples
+%{proton_datadir}/examples
 
 
 
@@ -118,7 +122,7 @@ Requires: python
 %defattr(-,root,root,-)
 %{python_sitearch}/_cproton.so
 %{python_sitearch}/cproton.*
-%{python_sitearch}/proton.*
+%{python_sitearch}/proton
 
 
 
@@ -137,10 +141,33 @@ BuildArch: noarch
 
 
 
+%package -n perl-qpid-proton
+Summary: Perl language bindings for Qpid Proton messaging framework
+
+# Remove with Proton 0.11
+Obsoletes: perl-qpid_proton < %{version}
+Provides:  perl-qpid_proton = %{version}-%{release}
+
+Requires:  perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
+Requires:  qpid-proton-c = %{version}-%{release}
+
+
+%description -n perl-qpid-proton
+%{summary}.
+
+
+%files -n perl-qpid-proton
+%doc LICENSE TODO README
+%{perl_vendorarch}/*
+
+
+
 %prep
 %setup -q -n %{name}-%{version}
 
 %patch0001 -p1
+%patch0002 -p1
+
 
 
 %build
@@ -151,16 +178,21 @@ BuildArch: noarch
     -DNOBUILD_RUBY=1 \
     -DNOBUILD_PHP=1 \
     -DSYSINSTALL_PYTHON=1 \
-    -DSYSINSTALL_PERL=0 \
+    -DSYSINSTALL_PERL=1 \
     -DCHECK_SYSINSTALL_PYTHON=0 \
     .
 make all docs %{?_smp_mflags}
 
 
+
 %install
 %make_install
 
+CPROTON_BUILD=$PWD . ./config.sh
+
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
+
+
 
 # clean up files that are not shipped
 rm -rf %{buildroot}%{_exec_prefix}/bindings
@@ -169,7 +201,19 @@ rm -rf %{buildroot}%{_libdir}/libproton-jni.so
 rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
 
+
+%check
+# check perl bindings
+pushd proton-c/bindings/perl
+make test
+popd
+
 %changelog
+* Mon Apr  6 2015 Darryl L. Pierce <dpierce@redhat.com> - 0.9-1
+- Rebased on Proton 0.9.
+- Removed the proton binary from qpid-proton-c.
+- Added the perl-qpid-proton subpackage.
+
 * Tue Nov 18 2014 Darryl L. Pierce <dpierce@redhat.com> - 0.8-1
 - Rebased on Proton 0.8.
 
