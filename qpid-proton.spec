@@ -1,9 +1,20 @@
 %global proton_datadir %{_datadir}/proton-%{version}
 %global gem_name qpid_proton
 
+# per https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering#Preventing_files.2Fdirectories_from_being_scanned_for_deps_.28pre-scan_filtering.29
+%global __provides_exclude_from ^%{_datadir}/proton-%{version}/examples/.*$
+%global __requires_exclude_from ^%{_datadir}/proton-%{version}/examples/.*$
+
+#  for older rpm, like el6, https://fedoraproject.org/wiki/EPEL:Packaging_Autoprovides_and_Requires_Filtering#Perl
+%{?filter_setup:
+%filter_provides_in %{_datadir}/proton-%{version}/examples/
+%filter_requires_in %{_datadir}/proton-%{version}/examples/
+%filter_setup
+}
+
 Name:           qpid-proton
 Version:        0.9
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -209,6 +220,9 @@ make test
 popd
 
 %changelog
+* Wed Apr  8 2015 Darryl L. Pierce <dpierce@redhat.com> - 0.9-3
+- Added a global excludes macro to fix EL6 issues with example Perl modules.
+
 * Wed Apr  8 2015 Darryl L. Pierce <dpierce@redhat.com> - 0.9-2
 - Marked the examples in -c-devel as doc.
 - Turned off the executable flag on all files under examples.
