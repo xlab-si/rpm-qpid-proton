@@ -3,7 +3,7 @@
 
 Name:           qpid-proton
 Version:        0.9
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -90,7 +90,7 @@ Provides:  qpid-proton-devel = %{version}-%{release}
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
 %{_libdir}/cmake/Proton
-%{proton_datadir}/examples
+%doc %{proton_datadir}/examples
 
 
 
@@ -191,7 +191,7 @@ make all docs %{?_smp_mflags}
 CPROTON_BUILD=$PWD . ./config.sh
 
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
-
+find %{buildroot}%{proton_datadir}/examples/ -type f | xargs chmod -x 
 
 
 # clean up files that are not shipped
@@ -209,6 +209,10 @@ make test
 popd
 
 %changelog
+* Wed Apr  8 2015 Darryl L. Pierce <dpierce@redhat.com> - 0.9-2
+- Marked the examples in -c-devel as doc.
+- Turned off the executable flag on all files under examples.
+
 * Mon Apr  6 2015 Darryl L. Pierce <dpierce@redhat.com> - 0.9-1
 - Rebased on Proton 0.9.
 - Removed the proton binary from qpid-proton-c.
