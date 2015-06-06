@@ -14,7 +14,7 @@
 
 Name:           qpid-proton
 Version:        0.9
-Release:        3%{?dist}
+Release:        4%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -220,6 +220,9 @@ make test
 popd
 
 %changelog
+* Sat Jun 06 2015 Jitka Plesnikova <jplesnik@redhat.com> - 0.9-4
+- Perl 5.22 rebuild
+
 * Wed Apr  8 2015 Darryl L. Pierce <dpierce@redhat.com> - 0.9-3
 - Added a global excludes macro to fix EL6 issues with example Perl modules.
 
