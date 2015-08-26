@@ -13,16 +13,14 @@
 }
 
 Name:           qpid-proton
-Version:        0.9
-Release:        5%{?dist}
+Version:        0.10
+Release:        1%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 
-Source0:        http://www.apache.org/dist/qpid/proton/%{version}/%{name}-%{version}.tar.gz
-Patch0001:      0001-NO-JIRA-Fix-install-of-Perl-bindings.patch
-Patch0002:      0002-PROTON-582-Added-in-missing-is_float-method-to-Perl-.patch
+Source0:        qpid-proton-%{version}/%{name}-%{version}.tar.gz
 
 %if (0%{?fedora} || 0%{?rhel} == 7)
 BuildRequires:  cmake >= 2.6
@@ -71,7 +69,7 @@ Provides:  qpid-proton = %{version}-%{release}
 %defattr(-,root,root,-)
 %dir %{proton_datadir}
 %doc %{proton_datadir}/LICENSE
-%doc %{proton_datadir}/README
+%doc %{proton_datadir}/README*
 %doc %{proton_datadir}/TODO
 %{_mandir}/man1/*
 %{_bindir}/proton-dump
@@ -168,17 +166,13 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 
 %files -n perl-qpid-proton
-%doc LICENSE TODO README
+%doc LICENSE TODO README*
 %{perl_vendorarch}/*
 
 
 
 %prep
 %setup -q -n %{name}-%{version}
-
-%patch0001 -p1
-%patch0002 -p1
-
 
 
 %build
@@ -220,6 +214,9 @@ make test
 popd
 
 %changelog
+* Tue Aug 26 2015 Irina Boverman <iboverma@redhat.com> - 0.10-1
+- Rebased to 0.10
+
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9-5
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_23_Mass_Rebuild
 
