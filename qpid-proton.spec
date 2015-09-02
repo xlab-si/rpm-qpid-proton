@@ -214,7 +214,7 @@ make test
 popd
 
 %changelog
-* Tue Aug 26 2015 Irina Boverman <iboverma@redhat.com> - 0.10-1
+* Wed Sep 2 2015 Irina Boverman <iboverma@redhat.com> - 0.10-1
 - Rebased to 0.10
 
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9-5
