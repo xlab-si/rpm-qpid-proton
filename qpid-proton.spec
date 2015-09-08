@@ -14,7 +14,7 @@
 
 Name:           qpid-proton
 Version:        0.10
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -43,8 +43,10 @@ BuildRequires:  epydoc
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More)
+BuildRequires:  cyrus-sasl-devel
+Requires:       cyrus-sasl-lib
 
-
+Patch0:         0001-PROTON-974-Accept-a-single-symbol-in-SASL-mechs-fram.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -173,7 +175,7 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
-
+%patch0 -p1
 
 %build
 
@@ -214,7 +216,11 @@ make test
 popd
 
 %changelog
-* Wed Sep 2 2015 Irina Boverman <iboverma@redhat.com> - 0.10-1
+* Tue Sep  8 2015 Irina Boverman <iboverma@redhat.com> - 0.10-2
+- Added dependency on cyrus-sasl-devel and cyrus-sasl-lib
+- Added 0001-PROTON-974-Accept-a-single-symbol-in-SASL-mechs-fram.patch
+ 
+* Wed Sep  2 2015 Irina Boverman <iboverma@redhat.com> - 0.10-1
 - Rebased to 0.10
 
 * Thu Jun 18 2015 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.9-5
