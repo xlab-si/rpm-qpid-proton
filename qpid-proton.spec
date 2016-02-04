@@ -14,7 +14,7 @@
 
 Name:           qpid-proton
 Version:        0.10
-Release:        2%{?dist}
+Release:        3%{?dist}
 Summary:        A high performance, lightweight messaging library
 
 License:        ASL 2.0
@@ -216,6 +216,9 @@ make test
 popd
 
 %changelog
+* Thu Feb 04 2016 Fedora Release Engineering <releng@fedoraproject.org> - 0.10-3
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_24_Mass_Rebuild
+
 * Tue Sep  8 2015 Irina Boverman <iboverma@redhat.com> - 0.10-2
 - Added dependency on cyrus-sasl-devel and cyrus-sasl-lib
 - Added 0001-PROTON-974-Accept-a-single-symbol-in-SASL-mechs-fram.patch
