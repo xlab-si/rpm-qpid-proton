@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.12.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -329,6 +329,9 @@ popd
 %endif
 
 %changelog
+* Sun May 15 2016 Jitka Plesnikova <jplesnik@redhat.com> - 0.12.1-2
+- Perl 5.24 rebuild
+
 * Wed Mar 23 2016 Irina Boverman <iboverma@redhat.com> - 0.12.1-1
 - Rebased to 0.12.1
 - Added python3 installation
