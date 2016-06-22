@@ -5,18 +5,18 @@
 %endif
 
 # per https://fedoraproject.org/wiki/Packaging:AutoProvidesAndRequiresFiltering#Preventing_files.2Fdirectories_from_being_scanned_for_deps_.28pre-scan_filtering.29
-%global __provides_exclude_from ^%{_datadir}/proton-%{version}/examples/.*$
-%global __requires_exclude_from ^%{_datadir}/proton-%{version}/examples/.*$
+%global __provides_exclude_from ^%{proton_datadir}/examples/.*$
+%global __requires_exclude_from ^%{proton_datadir}/examples/.*$
 
 #  for older rpm, like el6, https://fedoraproject.org/wiki/EPEL:Packaging_Autoprovides_and_Requires_Filtering#Perl
 %{?filter_setup:
-%filter_provides_in %{_datadir}/proton-%{version}/examples/
-%filter_requires_in %{_datadir}/proton-%{version}/examples/
+%filter_provides_in %{proton_datadir}/examples/
+%filter_requires_in %{proton_datadir}/examples/
 %filter_setup
 }
 
 Name:           qpid-proton
-Version:        0.12.1
+Version:        0.13.0
 Release:        1%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
@@ -44,8 +44,8 @@ BuildRequires:  epydoc
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More)
-BuildRequires:  cyrus-sasl-devel
 %endif
+BuildRequires:  cyrus-sasl-devel
 
 #Patch0:         proton.patch
 
@@ -73,10 +73,7 @@ Obsoletes: qpid-proton
 %doc %{proton_datadir}/LICENSE
 %doc %{proton_datadir}/README*
 %doc %{proton_datadir}/TODO
-%{_mandir}/man1/*
-%{_bindir}/proton-dump
 %{_libdir}/libqpid-proton.so.*
-%{_libdir}/cmake/Proton/Proton*
 
 %post c -p /sbin/ldconfig
 
@@ -97,9 +94,7 @@ Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
 %doc %{proton_datadir}/LICENSE
 %doc %{proton_datadir}/README*
 %doc %{proton_datadir}/TODO
-%{_mandir}/man1/*
 %{_libdir}/libqpid-proton-cpp.so.*
-%{_libdir}/cmake/ProtonCpp/ProtonCpp*
 
 %post cpp -p /sbin/ldconfig
 
@@ -124,28 +119,7 @@ Obsoletes: qpid-proton-devel
 %{_libdir}/libqpid-proton.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
 %{_libdir}/cmake/Proton
-%if 0%{?fedora}
-%doc %{proton_datadir}/examples
-%endif
-%if 0%{?rhel}
-%{_datadir}/proton-%{version}/examples
-%endif
-%exclude %{_datadir}/proton-%{version}/examples/cpp
-%exclude %{_datadir}/proton-%{version}/examples/go
-%exclude %{_datadir}/proton-%{version}/examples/java
-%exclude %{_datadir}/proton-%{version}/examples/javascript
-%exclude %{_datadir}/proton-%{version}/examples/php
-%exclude %{_datadir}/proton-%{version}/examples/python
-%exclude %{_datadir}/proton-%{version}/examples/ruby
-%exclude %{_datadir}/proton-%{version}/examples/perl
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/recv
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/recv-async
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/send
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/send-async
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/CMakeFiles
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/Makefile
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/cmake_install.cmake
-%exclude %{_datadir}/proton-%{version}/examples/c/messenger/CTestTestfile.cmake
+
 
 %if 0%{?rhel}
 %package cpp-devel
@@ -162,32 +136,75 @@ Summary:   Development libraries for writing messaging apps with Qpid Proton
 %{_includedir}/proton/*.hpp
 %{_libdir}/pkgconfig/libqpid-proton-cpp.pc
 %{_libdir}/libqpid-proton-cpp.so
-%{_datadir}/proton-%{version}/examples/cpp
+%{_libdir}/cmake/ProtonCpp
 %endif
 
 
-%package c-devel-doc
+%package c-devel-docs
 Summary:   Documentation for the C development libraries for Qpid Proton
 BuildArch: noarch
-
-%description c-devel-doc
+Obsoletes:  qpid-proton-c-devel-doc
+%description c-devel-docs
 %{summary}.
 
-%files c-devel-doc
+%files c-devel-docs
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-c
+%doc %{proton_datadir}/examples
+%exclude %{proton_datadir}/examples/cpp
+%exclude %{proton_datadir}/examples/go
+%exclude %{proton_datadir}/examples/java
+%exclude %{proton_datadir}/examples/javascript
+%exclude %{proton_datadir}/examples/php
+%exclude %{proton_datadir}/examples/python
+%exclude %{proton_datadir}/examples/ruby
+%exclude %{proton_datadir}/examples/perl
+%exclude %{proton_datadir}/examples/c/messenger/recv
+%exclude %{proton_datadir}/examples/c/messenger/recv-async
+%exclude %{proton_datadir}/examples/c/messenger/send
+%exclude %{proton_datadir}/examples/c/messenger/send-async
+%exclude %{proton_datadir}/examples/c/messenger/CMakeFiles
+%exclude %{proton_datadir}/examples/c/messenger/Makefile
+%exclude %{proton_datadir}/examples/c/messenger/cmake_install.cmake
+%exclude %{proton_datadir}/examples/c/messenger/CTestTestfile.cmake
+%exclude %{proton_datadir}/examples/engine/java
+%exclude %{proton_datadir}/examples/c/reactor/receiver
+%exclude %{proton_datadir}/examples/c/reactor/sender
+%exclude %{proton_datadir}/examples/c/reactor/CMakeFiles
+%exclude %{proton_datadir}/examples/c/reactor/Makefile
+%exclude %{proton_datadir}/examples/c/reactor/cmake_install.cmake
+%exclude %{proton_datadir}/examples/c/reactor/CTestTestfile.cmake
+%exclude %{proton_datadir}/examples/CMakeFiles
+%exclude %{proton_datadir}/examples/cmake_install.cmake
+%exclude %{proton_datadir}/examples/CTestTestfile.cmake
+%exclude %{proton_datadir}/examples/Makefile
+%exclude %{proton_datadir}/examples/c/CMakeFiles
+%exclude %{proton_datadir}/examples/c/cmake_install.cmake
+%exclude %{proton_datadir}/examples/c/CTestTestfile.cmake
+%exclude %{proton_datadir}/examples/c/Makefile
 
 %if 0%{?rhel}
-%package   cpp-devel-doc
+%package   cpp-devel-docs
 Summary:   Documentation for the C++ development libraries for Qpid Proton
 BuildArch: noarch
+Obsoletes:  qpid-proton-cpp-devel-doc
 
-%description cpp-devel-doc
+%description cpp-devel-docs
 %{summary}.
 
-%files cpp-devel-doc
+%files cpp-devel-docs
 %defattr(-,root,root,-)
 %{proton_datadir}/docs/api-cpp
+%doc %{proton_datadir}/examples
+%exclude %{proton_datadir}/examples/c
+%exclude %{proton_datadir}/examples/go
+%exclude %{proton_datadir}/examples/java
+%exclude %{proton_datadir}/examples/javascript
+%exclude %{proton_datadir}/examples/php
+%exclude %{proton_datadir}/examples/python
+%exclude %{proton_datadir}/examples/ruby
+%exclude %{proton_datadir}/examples/perl
+%exclude %{proton_datadir}/examples/engine
 %endif
 
 
@@ -228,17 +245,20 @@ Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 %{python3_sitearch}/*
 %endif
 
-%package -n python-qpid-proton-doc
+%package -n python-qpid-proton-docs
 Group:     Documentation
 Summary:   Documentation for the Python language bindings for Qpid Proton
 BuildArch: noarch
+Obsoletes:  python-qpid-proton-doc
 
-%description -n python-qpid-proton-doc
+%description -n python-qpid-proton-docs
 %{summary}.
 
-%files -n python-qpid-proton-doc
+%files -n python-qpid-proton-docs
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-py
+%doc %{proton_datadir}/examples/python
+
 
 %if 0%{?fedora}
 %package -n perl-qpid-proton
@@ -329,6 +349,10 @@ popd
 %endif
 
 %changelog
+* Wed Jun 22 2016 Irina Boverman <iboverma@redhat.com> - 0.13.0-1
+- Rebased to 0.13.0
+- Changed *doc to *docs, moved examples to *docs
+
 * Wed Mar 23 2016 Irina Boverman <iboverma@redhat.com> - 0.12.1-1
 - Rebased to 0.12.1
 - Added python3 installation
