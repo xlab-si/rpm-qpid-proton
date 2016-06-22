@@ -353,6 +353,9 @@ popd
 - Rebased to 0.13.0
 - Changed *doc to *docs, moved examples to *docs
 
+* Sun May 15 2016 Jitka Plesnikova <jplesnik@redhat.com> - 0.12.1-2
+- Perl 5.24 rebuild
+
 * Wed Mar 23 2016 Irina Boverman <iboverma@redhat.com> - 0.12.1-1
 - Rebased to 0.12.1
 - Added python3 installation
