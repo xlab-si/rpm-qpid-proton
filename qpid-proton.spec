@@ -41,6 +41,7 @@ BuildRequires:  python-devel
 %endif
 BuildRequires:  epydoc
 %if 0%{?fedora}
+BuildRequires:  perl-generators
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More)
