@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.13.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -350,6 +350,9 @@ popd
 %endif
 
 %changelog
+* Tue Jul 19 2016 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 0.13.0-2
+- https://fedoraproject.org/wiki/Changes/Automatic_Provides_for_Python_RPM_Packages
+
 * Wed Jun 22 2016 Irina Boverman <iboverma@redhat.com> - 0.13.0-1
 - Rebased to 0.13.0
 - Changed *doc to *docs, moved examples to *docs
