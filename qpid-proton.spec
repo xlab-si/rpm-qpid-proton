@@ -283,22 +283,27 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %build
 
+CXX11FLAG="-std=c++11"                                                                             <
+                                                                                                   <
+%if 0%{?rhel} <= 6                                                                                 <
+CXX11FLAG=""                                                                                       <
+%endif  
+
 %if 0%{?fedora}
 %cmake \
     -DPROTON_DISABLE_RPATH=true \
-    -DBUILD_RUBY=OFF \
-    -DBUILD_PHP=OFF \
+   "-DCMAKE_CXX_FLAGS=$CXX11FLAG $CXXFLAGS" \
     -DSYSINSTALL_PYTHON=1 \
     -DSYSINSTALL_PERL=1 \
     .
 %endif
 %if 0%{?rhel}
 %cmake -DPROTON_DISABLE_RPATH=true \
+      "-DCMAKE_CXX_FLAGS=$CXX11FLAG $CXXFLAGS" \
        -DCMAKE_EXE_LINKER_FLAGS="-Wl,-z,relro,-z,now" \
        -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,relro" \
        -DCMAKE_MODULE_LINKER_FLAGS="-Wl,-z,relro" \
        -DSYSINSTALL_BINDINGS=ON \
-       -DBUILD_RUBY=OFF \
        -DBUILD_PERL=OFF \
        .
 %endif
@@ -350,6 +355,9 @@ popd
 %endif
 
 %changelog
+* Mon Aug 8  2016 Irina Boverman <iboverma@redhat.com> - 0.13.1-?
+- Added "-std=c++11" flag
+
 * Mon Aug 1  2016 Irina Boverman <iboverma@redhat.com> - 0.13.1-1
 - Rebased to 0.13.1
 
