@@ -283,11 +283,11 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %build
 
-CXX11FLAG="-std=c++11"                                                                             <
-                                                                                                   <
-%if 0%{?rhel} <= 6                                                                                 <
-CXX11FLAG=""                                                                                       <
-%endif  
+CXX11FLAG="-std=c++11"
+
+%if 0%{?rhel} <= 6
+CXX11FLAG=""
+%endif
 
 %if 0%{?fedora}
 %cmake \
