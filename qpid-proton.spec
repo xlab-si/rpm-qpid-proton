@@ -285,8 +285,10 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 CXX11FLAG="-std=c++11"
 
+%if 0%{?rhel} 
 %if 0%{?rhel} <= 6
 CXX11FLAG=""
+%endif
 %endif
 
 %if 0%{?fedora}
