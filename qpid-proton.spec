@@ -16,7 +16,7 @@
 }
 
 Name:           qpid-proton
-Version:        0.13.1
+Version:        0.14.0
 Release:        1%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
@@ -357,8 +357,9 @@ popd
 %endif
 
 %changelog
-* Mon Aug 8  2016 Irina Boverman <iboverma@redhat.com> - 0.13.1-?
+* Tue Sep 6  2016 Irina Boverman <iboverma@redhat.com> - 0.14.0-1
 - Added "-std=c++11" flag
+- Rebased to 0.14.0
 
 * Mon Aug 1  2016 Irina Boverman <iboverma@redhat.com> - 0.13.1-1
 - Rebased to 0.13.1
