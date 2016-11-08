@@ -31,7 +31,7 @@ BuildRequires:  swig
 BuildRequires:  pkgconfig
 BuildRequires:  doxygen
 BuildRequires:  libuuid-devel
-BuildRequires:  openssl-devel
+BuildRequires:  compat-openssl10-devel
 %if 0%{?fedora} 
 BuildRequires:  python2-devel
 BuildRequires:  python3-devel
@@ -316,6 +316,7 @@ rm -rf %{buildroot}%{_libdir}/cmake/ProtonCpp
 rm -rf %{buildroot}%{_libdir}/*cpp*
 rm -rf %{buildroot}%{_libdir}/pkgconfig/libqpid-proton-cpp.pc
 rm -rf %{buildroot}%{proton_datadir}/docs/api-cpp
+rm -rf %{buildroot}%{proton_datadir}/examples/cpp
 %endif
 %if 0%{?rhel}
 rm -rf %{buildroot}%{_libdir}/perl5
@@ -325,6 +326,7 @@ rm -rf %{buildroot}%{_datarootdir}/php
 rm -rf %{buildroot}%{_datarootdir}/perl5
 rm -rf %{buildroot}%{_datarootdir}/ruby
 rm -rf %{buildroot}%{_sysconfdir}/php.d
+%endif
 rm -fr %{buildroot}%{proton_datadir}/examples/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/CTestTestfile.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/Makefile
@@ -344,6 +346,7 @@ rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/Makefile
 rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/receiver
 rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/sender
+%if 0%{?rhel}
 rm -fr %{buildroot}%{proton_datadir}/examples/cpp/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/Makefile
@@ -368,6 +371,7 @@ rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_recv
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_send
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl_client_cert
+%endif
 rm -fr %{buildroot}%{proton_datadir}/examples/engine/java
 rm -fr %{buildroot}%{proton_datadir}/examples/go
 rm -fr %{buildroot}%{proton_datadir}/examples/java
@@ -375,7 +379,7 @@ rm -fr %{buildroot}%{proton_datadir}/examples/javascript
 rm -fr %{buildroot}%{proton_datadir}/examples/ruby
 rm -fr %{buildroot}%{proton_datadir}/examples/perl
 rm -fr %{buildroot}%{proton_datadir}/examples/php
-%endif
+
 
 %check
 %if 0%{?fedora} 
