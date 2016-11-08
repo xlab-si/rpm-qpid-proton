@@ -140,72 +140,49 @@ Summary:   Development libraries for writing messaging apps with Qpid Proton
 %{_libdir}/cmake/ProtonCpp
 %endif
 
-
-%package c-devel-docs
+%package c-docs
 Summary:   Documentation for the C development libraries for Qpid Proton
 BuildArch: noarch
-Obsoletes:  qpid-proton-c-devel-doc
-%description c-devel-docs
+Obsoletes: qpid-proton-c-devel-doc
+Obsoletes: qpid-proton-c-devel-docs 
+
+%description c-docs
 %{summary}.
 
-%files c-devel-docs
+%files c-docs
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-c
-%doc %{proton_datadir}/examples
-%exclude %{proton_datadir}/examples/cpp
-%exclude %{proton_datadir}/examples/go
-%exclude %{proton_datadir}/examples/java
-%exclude %{proton_datadir}/examples/javascript
-%exclude %{proton_datadir}/examples/php
-%exclude %{proton_datadir}/examples/python
-%exclude %{proton_datadir}/examples/ruby
-%exclude %{proton_datadir}/examples/perl
-%exclude %{proton_datadir}/examples/c/messenger/recv
-%exclude %{proton_datadir}/examples/c/messenger/recv-async
-%exclude %{proton_datadir}/examples/c/messenger/send
-%exclude %{proton_datadir}/examples/c/messenger/send-async
-%exclude %{proton_datadir}/examples/c/messenger/CMakeFiles
-%exclude %{proton_datadir}/examples/c/messenger/Makefile
-%exclude %{proton_datadir}/examples/c/messenger/cmake_install.cmake
-%exclude %{proton_datadir}/examples/c/messenger/CTestTestfile.cmake
-%exclude %{proton_datadir}/examples/engine/java
-%exclude %{proton_datadir}/examples/c/reactor/receiver
-%exclude %{proton_datadir}/examples/c/reactor/sender
-%exclude %{proton_datadir}/examples/c/reactor/CMakeFiles
-%exclude %{proton_datadir}/examples/c/reactor/Makefile
-%exclude %{proton_datadir}/examples/c/reactor/cmake_install.cmake
-%exclude %{proton_datadir}/examples/c/reactor/CTestTestfile.cmake
-%exclude %{proton_datadir}/examples/CMakeFiles
-%exclude %{proton_datadir}/examples/cmake_install.cmake
-%exclude %{proton_datadir}/examples/CTestTestfile.cmake
-%exclude %{proton_datadir}/examples/Makefile
-%exclude %{proton_datadir}/examples/c/CMakeFiles
-%exclude %{proton_datadir}/examples/c/cmake_install.cmake
-%exclude %{proton_datadir}/examples/c/CTestTestfile.cmake
-%exclude %{proton_datadir}/examples/c/Makefile
+%doc %{proton_datadir}/examples/c/*.txt
+%doc %{proton_datadir}/examples/c/include
+%doc %{proton_datadir}/examples/c/messenger/*.txt
+%doc %{proton_datadir}/examples/c/messenger/*.c
+%doc %{proton_datadir}/examples/c/reactor/*.txt
+%doc %{proton_datadir}/examples/c/reactor/README
+%doc %{proton_datadir}/examples/c/reactor/*.c
+%doc %{proton_datadir}/examples/engine/c/*.c
 
 %if 0%{?rhel}
-%package   cpp-devel-docs
+%package   cpp-docs
 Summary:   Documentation for the C++ development libraries for Qpid Proton
 BuildArch: noarch
-Obsoletes:  qpid-proton-cpp-devel-doc
+Obsoletes: qpid-proton-cpp-devel-doc
+Obsoletes: qpid-proton-cpp-devel-docs
 
-%description cpp-devel-docs
+%description cpp-docs
 %{summary}.
 
-%files cpp-devel-docs
+%files cpp-docs
 %defattr(-,root,root,-)
 %{proton_datadir}/docs/api-cpp
-%doc %{proton_datadir}/examples
-%exclude %{proton_datadir}/examples/c
-%exclude %{proton_datadir}/examples/go
-%exclude %{proton_datadir}/examples/java
-%exclude %{proton_datadir}/examples/javascript
-%exclude %{proton_datadir}/examples/php
-%exclude %{proton_datadir}/examples/python
-%exclude %{proton_datadir}/examples/ruby
-%exclude %{proton_datadir}/examples/perl
-%exclude %{proton_datadir}/examples/engine
+%doc %{proton_datadir}/examples/cpp/*.txt
+%doc %{proton_datadir}/examples/cpp/*.cpp
+%doc %{proton_datadir}/examples/cpp/*.hpp
+%doc %{proton_datadir}/examples/cpp/*.py*
+%exclude %{proton_datadir}/examples/cpp/*.pyo
+%exclude %{proton_datadir}/examples/cpp/*.pyc
+%doc %{proton_datadir}/examples/cpp/mt
+%doc %{proton_datadir}/examples/cpp/ssl_certs
+%doc %{proton_datadir}/examples/cpp/*.dox
 %endif
 
 
@@ -316,6 +293,8 @@ make all docs %{?_smp_mflags}
 %endif
 
 %install
+rm -rf %{buildroot}
+
 %make_install
 %if 0%{?fedora}
 (cd proton-c/bindings/python; %py3_install)
@@ -346,6 +325,54 @@ rm -rf %{buildroot}%{_datarootdir}/php
 rm -rf %{buildroot}%{_datarootdir}/perl5
 rm -rf %{buildroot}%{_datarootdir}/ruby
 rm -rf %{buildroot}%{_sysconfdir}/php.d
+rm -fr %{buildroot}%{proton_datadir}/examples/CMakeFiles
+rm -f  %{buildroot}%{proton_datadir}/examples/CTestTestfile.cmake
+rm -f  %{buildroot}%{proton_datadir}/examples/Makefile
+rm -f  %{buildroot}%{proton_datadir}/examples/*.cmake
+rm -fr %{buildroot}%{proton_datadir}/examples/c/CMakeFiles
+rm -f  %{buildroot}%{proton_datadir}/examples/c/*.cmake
+rm -f  %{buildroot}%{proton_datadir}/examples/c/Makefile
+rm -fr %{buildroot}%{proton_datadir}/examples/c/messenger/CMakeFiles
+rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/*.cmake
+rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/Makefile
+rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/recv
+rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/recv-async
+rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/send
+rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/send-async
+rm -fr %{buildroot}%{proton_datadir}/examples/c/reactor/CMakeFiles
+rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/*.cmake
+rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/Makefile
+rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/receiver
+rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/sender
+rm -fr %{buildroot}%{proton_datadir}/examples/cpp/CMakeFiles
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/*.cmake
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/Makefile
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/broker
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/client
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/connection_options
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/direct_recv
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/direct_send
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/encode_decode
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/flow_control
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/helloworld
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/helloworld_direct
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/queue_browser
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/scheduled_send_03
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/selected_recv
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/server
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/server_direct
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/service_bus
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_recv
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_send
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl_client_cert
+rm -fr %{buildroot}%{proton_datadir}/examples/engine/java
+rm -fr %{buildroot}%{proton_datadir}/examples/go
+rm -fr %{buildroot}%{proton_datadir}/examples/java
+rm -fr %{buildroot}%{proton_datadir}/examples/javascript
+rm -fr %{buildroot}%{proton_datadir}/examples/ruby
+rm -fr %{buildroot}%{proton_datadir}/examples/perl
+rm -fr %{buildroot}%{proton_datadir}/examples/php
 %endif
 
 %check
@@ -357,6 +384,11 @@ popd
 %endif
 
 %changelog
+* Mon Nov  7 2016 Irina Boverman <iboverma@redhat.com> - ?
+- Renamed sub-packages qpid-proton-c-devel-docs/qpid-proton-cpp-devel-docs
+  to qpid-proton-c-docs/qpid-proton-cpp-docs
+- Removed binary and derived files from qpid-proton-cpp-docs package
+
 * Tue Sep 6  2016 Irina Boverman <iboverma@redhat.com> - 0.14.0-1
 - Added "-std=c++11" flag
 - Rebased to 0.14.0
