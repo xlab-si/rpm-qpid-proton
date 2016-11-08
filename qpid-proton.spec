@@ -356,8 +356,10 @@ rm -f  %{buildroot}%{proton_datadir}/examples/cpp/encode_decode
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/flow_control
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/helloworld
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/helloworld_direct
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/mt_broker
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/queue_browser
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/scheduled_send_03
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/scheduled_send
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/selected_recv
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/server
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/server_direct
