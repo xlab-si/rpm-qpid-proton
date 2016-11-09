@@ -31,7 +31,11 @@ BuildRequires:  swig
 BuildRequires:  pkgconfig
 BuildRequires:  doxygen
 BuildRequires:  libuuid-devel
+%if (0%{?fedora} && 0%{fedora} > 25)
 BuildRequires:  compat-openssl10-devel
+%else
+BuildRequires:  openssl-devel
+%endif
 %if 0%{?fedora} 
 BuildRequires:  python2-devel
 BuildRequires:  python3-devel
@@ -48,7 +52,9 @@ BuildRequires:  perl(Test::More)
 %endif
 BuildRequires:  cyrus-sasl-devel
 
-#Patch0:         proton.patch
+%if (0%{?rhel} && 0%{?rhel} == 7)
+Patch0:         proton.patch
+%endif
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -256,16 +262,16 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
-#%patch0 -p1
+%if (0%{?rhel} && 0%{?rhel} == 7)
+%patch0 -p1
+%endif
 
 %build
 
 CXX11FLAG="-std=c++11"
 
-%if 0%{?rhel} 
-%if 0%{?rhel} <= 6
+%if (0%{?rhel} && 0%{?rhel} <= 6) 
 CXX11FLAG=""
-%endif
 %endif
 
 %if 0%{?fedora}
