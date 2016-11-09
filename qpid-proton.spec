@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.14.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -398,7 +398,7 @@ popd
 %endif
 
 %changelog
-* Mon Nov  7 2016 Irina Boverman <iboverma@redhat.com> - ?
+* Wed Nov  9 2016 Irina Boverman <iboverma@redhat.com> - 0.14.0-2
 - Renamed sub-packages qpid-proton-c-devel-docs/qpid-proton-cpp-devel-docs
   to qpid-proton-c-docs/qpid-proton-cpp-docs
 - Removed binary and derived files from qpid-proton-cpp-docs package
