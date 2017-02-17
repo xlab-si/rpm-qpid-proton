@@ -307,7 +307,7 @@ CXX11FLAG=""
 
 make all docs %{?_smp_mflags}
 %if 0%{?fedora}
-(cd bindings/python; %py3_build)
+(cd proton-c/bindings/python/dist; %py3_build)
 %endif
 
 %install
@@ -315,7 +315,7 @@ rm -rf %{buildroot}
 
 %make_install
 %if 0%{?fedora}
-(cd bindings/python; %py3_install)
+(cd proton-c/bindings/python/dist; %py3_install)
 %endif
 
 CPROTON_BUILD=$PWD . ./config.sh
