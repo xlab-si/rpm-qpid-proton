@@ -173,7 +173,7 @@ Obsoletes: qpid-proton-c-devel-docs
 %doc %{proton_datadir}/examples/c/reactor/*.c
 %doc %{proton_datadir}/examples/c/proactor/CMakeLists.txt
 %doc %{proton_datadir}/examples/c/proactor/*.c
-%doc %{proton_datadir}/examples/c/proactor/*.h
+#%doc %{proton_datadir}/examples/c/proactor/*.h
 %doc %{proton_datadir}/examples/c/proactor/README.dox
 %doc %{proton_datadir}/examples/c/proactor/*.py*
 %exclude %{proton_datadir}/examples/c/proactor/*.pyc
