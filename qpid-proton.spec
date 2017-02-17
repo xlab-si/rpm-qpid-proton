@@ -81,8 +81,8 @@ Obsoletes: qpid-proton
 %dir %{proton_datadir}
 %doc %{proton_datadir}/LICENSE
 %doc %{proton_datadir}/README*
-%doc %{proton_datadir}/TODO
 %{_libdir}/libqpid-proton.so.*
+%{_libdir}/libqpid-proton-core.so.*
 
 %post c -p /sbin/ldconfig
 
@@ -102,7 +102,6 @@ Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
 %dir %{proton_datadir}
 %doc %{proton_datadir}/LICENSE
 %doc %{proton_datadir}/README*
-%doc %{proton_datadir}/TODO
 %{_libdir}/libqpid-proton-cpp.so.*
 
 %post cpp -p /sbin/ldconfig
@@ -126,7 +125,9 @@ Obsoletes: qpid-proton-devel
 %exclude %{_includedir}/proton/*.hpp
 %endif
 %{_libdir}/libqpid-proton.so
+%{_libdir}/libqpid-proton-core.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
+%{_libdir}/pkgconfig/libqpid-proton-core.pc
 %{_libdir}/cmake/Proton
 
 
@@ -160,6 +161,9 @@ Obsoletes: qpid-proton-c-devel-docs
 %files c-docs
 %defattr(-,root,root,-)
 %doc %{proton_datadir}/docs/api-c
+%doc %{proton_datadir}/examples/*.py
+%exclude %{proton_datadir}/examples/*.pyc
+%exclude %{proton_datadir}/examples/*.pyo
 %doc %{proton_datadir}/examples/c/*.txt
 %doc %{proton_datadir}/examples/c/include
 %doc %{proton_datadir}/examples/c/messenger/*.txt
@@ -167,7 +171,13 @@ Obsoletes: qpid-proton-c-devel-docs
 %doc %{proton_datadir}/examples/c/reactor/*.txt
 %doc %{proton_datadir}/examples/c/reactor/README
 %doc %{proton_datadir}/examples/c/reactor/*.c
-%doc %{proton_datadir}/examples/engine/c/*.c
+%doc %{proton_datadir}/examples/c/proactor/CMakeLists.txt
+%doc %{proton_datadir}/examples/c/proactor/*.c
+%doc %{proton_datadir}/examples/c/proactor/*.h
+%doc %{proton_datadir}/examples/c/proactor/README.dox
+%doc %{proton_datadir}/examples/c/proactor/*.py*
+%exclude %{proton_datadir}/examples/c/proactor/*.pyc
+%exclude %{proton_datadir}/examples/c/proactor/*.pyo
 
 %if 0%{?rhel}
 %package   cpp-docs
@@ -257,7 +267,7 @@ Requires:  qpid-proton-c = %{version}-%{release}
 %{summary}.
 
 %files -n perl-qpid-proton
-%doc LICENSE TODO README*
+%doc LICENSE README*
 %{perl_vendorarch}/*
 %endif
 
@@ -354,6 +364,9 @@ rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/Makefile
 rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/receiver
 rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/sender
+rm -fr %{buildroot}%{proton_datadir}/examples/c/proactor/CMakeFiles
+rm -f  %{buildroot}%{proton_datadir}/examples/c/proactor/*.cmake
+rm -f  %{buildroot}%{proton_datadir}/examples/c/proactor/Makefile
 %if 0%{?rhel}
 rm -fr %{buildroot}%{proton_datadir}/examples/cpp/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/*.cmake
@@ -398,6 +411,9 @@ popd
 %endif
 
 %changelog
+* Fri Feb 17 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-1
+- Rebased to 0.17.0
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
