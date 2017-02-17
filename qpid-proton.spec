@@ -16,8 +16,8 @@
 }
 
 Name:           qpid-proton
-Version:        0.14.0
-Release:        4%{?dist}
+Version:        0.17.0
+Release:        1%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
