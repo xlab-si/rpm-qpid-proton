@@ -88,7 +88,7 @@ Obsoletes: qpid-proton
 
 %postun c -p /sbin/ldconfig
 
-%if 0%{?rhel}
+
 %package   cpp
 Group:     System Environment/Libraries
 Summary:   C++ libraries for Qpid Proton
@@ -107,7 +107,7 @@ Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
 %post cpp -p /sbin/ldconfig
 
 %postun cpp -p /sbin/ldconfig
-%endif
+
 
 %package c-devel
 Group:     Development/System
@@ -131,7 +131,6 @@ Obsoletes: qpid-proton-devel
 %{_libdir}/cmake/Proton
 
 
-%if 0%{?rhel}
 %package cpp-devel
 Group:     Development/System
 Requires:  qpid-proton-cpp%{?_isa} = %{version}-%{release}
@@ -147,7 +146,7 @@ Summary:   Development libraries for writing messaging apps with Qpid Proton
 %{_libdir}/pkgconfig/libqpid-proton-cpp.pc
 %{_libdir}/libqpid-proton-cpp.so
 %{_libdir}/cmake/ProtonCpp
-%endif
+
 
 %package c-docs
 Summary:   Documentation for the C development libraries for Qpid Proton
@@ -179,7 +178,7 @@ Obsoletes: qpid-proton-c-devel-docs
 %exclude %{proton_datadir}/examples/c/proactor/*.pyc
 %exclude %{proton_datadir}/examples/c/proactor/*.pyo
 
-%if 0%{?rhel}
+
 %package   cpp-docs
 Summary:   Documentation for the C++ development libraries for Qpid Proton
 BuildArch: noarch
@@ -201,7 +200,6 @@ Obsoletes: qpid-proton-cpp-devel-docs
 %doc %{proton_datadir}/examples/cpp/mt
 %doc %{proton_datadir}/examples/cpp/ssl_certs
 %doc %{proton_datadir}/examples/cpp/*.dox
-%endif
 
 
 %package -n python-qpid-proton
@@ -329,13 +327,11 @@ rm -rf %{buildroot}%{_libdir}/java
 rm -rf %{buildroot}%{_libdir}/libproton-jni.so
 rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
-%if 0%{?fedora}
 rm -rf %{buildroot}%{_libdir}/cmake/ProtonCpp
 rm -rf %{buildroot}%{_libdir}/*cpp*
 rm -rf %{buildroot}%{_libdir}/pkgconfig/libqpid-proton-cpp.pc
 rm -rf %{buildroot}%{proton_datadir}/docs/api-cpp
 rm -rf %{buildroot}%{proton_datadir}/examples/cpp
-%endif
 %if 0%{?rhel}
 rm -rf %{buildroot}%{_libdir}/perl5
 rm -rf %{buildroot}%{_libdir}/php
@@ -367,7 +363,6 @@ rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/sender
 rm -fr %{buildroot}%{proton_datadir}/examples/c/proactor/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/c/proactor/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/c/proactor/Makefile
-%if 0%{?rhel}
 rm -fr %{buildroot}%{proton_datadir}/examples/cpp/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/Makefile
@@ -392,7 +387,6 @@ rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_recv
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_send
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl_client_cert
-%endif
 rm -fr %{buildroot}%{proton_datadir}/examples/engine/java
 rm -fr %{buildroot}%{proton_datadir}/examples/go
 rm -fr %{buildroot}%{proton_datadir}/examples/java
@@ -411,8 +405,9 @@ popd
 %endif
 
 %changelog
-* Fri Feb 17 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-1
+* Mon Feb 20 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-1
 - Rebased to 0.17.0
+- Added *cpp* packages
 
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.14.0-4
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
