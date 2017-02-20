@@ -327,11 +327,6 @@ rm -rf %{buildroot}%{_libdir}/java
 rm -rf %{buildroot}%{_libdir}/libproton-jni.so
 rm -rf %{buildroot}%{_datarootdir}/java
 rm -rf %{buildroot}%{_libdir}/proton.cmake
-rm -rf %{buildroot}%{_libdir}/cmake/ProtonCpp
-rm -rf %{buildroot}%{_libdir}/*cpp*
-rm -rf %{buildroot}%{_libdir}/pkgconfig/libqpid-proton-cpp.pc
-rm -rf %{buildroot}%{proton_datadir}/docs/api-cpp
-rm -rf %{buildroot}%{proton_datadir}/examples/cpp
 %if 0%{?rhel}
 rm -rf %{buildroot}%{_libdir}/perl5
 rm -rf %{buildroot}%{_libdir}/php
