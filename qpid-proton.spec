@@ -54,9 +54,7 @@ BuildRequires:  perl(Test::More)
 %endif
 BuildRequires:  cyrus-sasl-devel
 
-%if (0%{?rhel} && 0%{?rhel} == 7)
-Patch0:         proton.patch
-%endif
+#Patch0:         proton.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -272,9 +270,7 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
-%if (0%{?rhel} && 0%{?rhel} == 7)
-%patch0 -p1
-%endif
+#%patch0 -p1
 
 %build
 
