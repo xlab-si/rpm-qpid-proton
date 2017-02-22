@@ -396,7 +396,7 @@ popd
 %endif
 
 %changelog
-* Mon Feb 20 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-1
+* Tue Feb 21 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-1
 - Rebased to 0.17.0
 - Added *cpp* packages
 
