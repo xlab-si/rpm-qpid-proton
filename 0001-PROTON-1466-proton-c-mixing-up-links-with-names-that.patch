@@ -1,0 +1,198 @@
+From ea875055e446da8514b10e3b6af0942997544af0 Mon Sep 17 00:00:00 2001
+From: Alan Conway <aconway@redhat.com>
+Date: Wed, 10 May 2017 16:30:14 -0400
+Subject: [PATCH] PROTON-1466: proton-c mixing up links with names that are
+ prefixes
+
+Creating links where one link name is a prefix of the other, e.g. "xx" and
+"xxyy" sometimes caused the links to be confused.
+---
+ proton-c/src/core/codec.c     |  2 +-
+ proton-c/src/core/transport.c | 14 +++++------
+ proton-c/src/core/util.h      | 11 +++++++++
+ proton-c/src/extra/scanner.c  |  8 ++++---
+ proton-c/src/tests/engine.c   | 55 +++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 79 insertions(+), 11 deletions(-)
+
+diff --git a/proton-c/src/core/codec.c b/proton-c/src/core/codec.c
+index 67769ad..7809907 100644
+--- a/proton-c/src/core/codec.c
++++ b/proton-c/src/core/codec.c
+@@ -1328,7 +1328,7 @@ bool pn_data_lookup(pn_data_t *data, const char *name)
+     case PN_SYMBOL:
+       {
+         pn_bytes_t bytes = pn_data_get_bytes(data);
+-        if (strlen(name) == bytes.size && !strncmp(name, bytes.start, bytes.size)) {
++        if (pn_bytes_equal(bytes, pn_bytes(strlen(name), name))) {
+           return pn_data_next(data);
+         }
+       }
+diff --git a/proton-c/src/core/transport.c b/proton-c/src/core/transport.c
+index 8777318..f9eea7b 100644
+--- a/proton-c/src/core/transport.c
++++ b/proton-c/src/core/transport.c
+@@ -1277,7 +1277,7 @@ pn_link_t *pn_find_link(pn_session_t *ssn, pn_bytes_t name, bool is_sender)
+         // which is closed both locally and remotely, assume that is
+         // no longer in use.
+         !((link->endpoint.state & PN_LOCAL_CLOSED) && (link->endpoint.state & PN_REMOTE_CLOSED)) &&
+-        !strncmp(name.start, pn_string_get(link->name), name.size))
++        pn_bytes_equal(name, pn_string_bytes(link->name)))
+     {
+       return link;
+     }
+@@ -1290,13 +1290,13 @@ static pn_expiry_policy_t symbol2policy(pn_bytes_t symbol)
+   if (!symbol.start)
+     return PN_EXPIRE_WITH_SESSION;
+ 
+-  if (!strncmp(symbol.start, "link-detach", symbol.size))
++  if (pn_bytes_equal(symbol, PN_BYTES_LITERAL(link-detach)))
+     return PN_EXPIRE_WITH_LINK;
+-  if (!strncmp(symbol.start, "session-end", symbol.size))
++  if (pn_bytes_equal(symbol, PN_BYTES_LITERAL(session-end)))
+     return PN_EXPIRE_WITH_SESSION;
+-  if (!strncmp(symbol.start, "connection-close", symbol.size))
++  if (pn_bytes_equal(symbol, PN_BYTES_LITERAL(connection-close)))
+     return PN_EXPIRE_WITH_CONNECTION;
+-  if (!strncmp(symbol.start, "never", symbol.size))
++  if (pn_bytes_equal(symbol, PN_BYTES_LITERAL(never)))
+     return PN_EXPIRE_NEVER;
+ 
+   return PN_EXPIRE_WITH_SESSION;
+@@ -1307,9 +1307,9 @@ static pn_distribution_mode_t symbol2dist_mode(const pn_bytes_t symbol)
+   if (!symbol.start)
+     return PN_DIST_MODE_UNSPECIFIED;
+ 
+-  if (!strncmp(symbol.start, "move", symbol.size))
++  if (pn_bytes_equal(symbol, PN_BYTES_LITERAL(move)))
+     return PN_DIST_MODE_MOVE;
+-  if (!strncmp(symbol.start, "copy", symbol.size))
++  if (pn_bytes_equal(symbol, PN_BYTES_LITERAL(copy)))
+     return PN_DIST_MODE_COPY;
+ 
+   return PN_DIST_MODE_UNSPECIFIED;
+diff --git a/proton-c/src/core/util.h b/proton-c/src/core/util.h
+index b54f689..4d3ba3b 100644
+--- a/proton-c/src/core/util.h
++++ b/proton-c/src/core/util.h
+@@ -44,6 +44,17 @@ char *pn_strndup(const char *src, size_t n);
+ int pn_strcasecmp(const char* a, const char* b);
+ int pn_strncasecmp(const char* a, const char* b, size_t len);
+ 
++static inline bool pn_bytes_equal(const pn_bytes_t a, const pn_bytes_t b) {
++  return (a.size == b.size && !memcmp(a.start, b.start, a.size));
++}
++
++static inline pn_bytes_t pn_string_bytes(pn_string_t *s) {
++  return pn_bytes(pn_string_size(s), pn_string_get(s));
++}
++
++/* Create a literal bytes value, e.g. PN_BYTES_LITERAL(foo) == pn_bytes(3, "foo") */
++#define PN_BYTES_LITERAL(X) (pn_bytes(sizeof(#X)-1, #X))
++
+ #define DIE_IFR(EXPR, STRERR)                                           \
+   do {                                                                  \
+     int __code__ = (EXPR);                                              \
+diff --git a/proton-c/src/extra/scanner.c b/proton-c/src/extra/scanner.c
+index beb7322..99c35d2 100644
+--- a/proton-c/src/extra/scanner.c
++++ b/proton-c/src/extra/scanner.c
+@@ -20,6 +20,7 @@
+  */
+ 
+ #include "scanner.h"
++#include "../core/util.h"
+ 
+ #include "platform/platform.h"
+ 
+@@ -217,12 +218,13 @@ static int pni_scanner_alpha_end(pn_scanner_t *scanner, const char *str, int sta
+ static int pni_scanner_alpha(pn_scanner_t *scanner, const char *str)
+ {
+   int n = pni_scanner_alpha_end(scanner, str, 0);
++  pn_bytes_t b = pn_bytes(n, str);
+   pn_token_type_t type;
+-  if (!strncmp(str, "true", n)) {
++  if (pn_bytes_equal(b, PN_BYTES_LITERAL(true))) {
+     type = PN_TOK_TRUE;
+-  } else if (!strncmp(str, "false", n)) {
++  } else if (pn_bytes_equal(b, PN_BYTES_LITERAL(false))) {
+     type = PN_TOK_FALSE;
+-  } else if (!strncmp(str, "null", n)) {
++  } else if (pn_bytes_equal(b, PN_BYTES_LITERAL(null))) {
+     type = PN_TOK_NULL;
+   } else {
+     type = PN_TOK_ID;
+diff --git a/proton-c/src/tests/engine.c b/proton-c/src/tests/engine.c
+index 87d8d95..41d17a0 100644
+--- a/proton-c/src/tests/engine.c
++++ b/proton-c/src/tests/engine.c
+@@ -294,12 +294,67 @@ int test_free_link(int argc, char **argv)
+     return 0;
+ }
+ 
++// regression test fo PROTON-1466 - confusion between links with prefix names
++static int test_link_name_prefix(int argc, char **argv)
++{
++    fprintf(stdout, "test_link_name_prefix\n");
++    pn_connection_t *c1 = pn_connection();
++    pn_transport_t  *t1 = pn_transport();
++    pn_transport_bind(t1, c1);
++
++    pn_connection_t *c2 = pn_connection();
++    pn_transport_t  *t2 = pn_transport();
++    pn_transport_set_server(t2);
++    pn_transport_bind(t2, c2);
++
++    pn_connection_open(c1);
++    pn_connection_open(c2);
++
++    pn_session_t *s1 = pn_session(c1);
++    pn_session_open(s1);
++
++    pn_link_t *l = pn_receiver(s1, "l");
++    pn_link_open(l);
++    pn_link_t *lll = pn_receiver(s1, "lll");
++    pn_link_open(lll);
++    pn_link_t *ll = pn_receiver(s1, "ll");
++    pn_link_open(ll);
++
++    while (pump(t1, t2)) {
++        process_endpoints(c1);
++        process_endpoints(c2);
++    }
++
++    // session and link should be up, c2 should have a receiver link:
++    assert(pn_session_state( s1 ) == (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++    assert(pn_link_state( l ) == (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++    assert(pn_link_state( lll ) == (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++    assert(pn_link_state( ll ) == (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++
++    pn_link_t *r = pn_link_head(c2, (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++    assert(!strcmp(pn_link_name(r), "l"));
++    r = pn_link_next(r, (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++    assert(!strcmp(pn_link_name(r), "lll"));
++    r = pn_link_next(r, (PN_LOCAL_ACTIVE | PN_REMOTE_ACTIVE));
++    assert(!strcmp(pn_link_name(r), "ll"));
++
++    pn_transport_unbind(t1);
++    pn_transport_free(t1);
++    pn_connection_free(c1);
++
++    pn_transport_unbind(t2);
++    pn_transport_free(t2);
++    pn_connection_free(c2);
++
++    return 0;
++}
+ 
+ typedef int (*test_ptr_t)(int argc, char **argv);
+ 
+ test_ptr_t tests[] = {test_free_connection,
+                       test_free_session,
+                       test_free_link,
++                      test_link_name_prefix,
+                       NULL};
+ 
+ int main(int argc, char **argv)
+-- 
+2.9.3
+

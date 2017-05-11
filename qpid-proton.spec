@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.17.0
-Release:        1%{?dist}
+Release:        2%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -54,7 +54,7 @@ BuildRequires:  perl(Test::More)
 %endif
 BuildRequires:  cyrus-sasl-devel
 
-#Patch0:         proton.patch
+Patch0: 0001-PROTON-1466-proton-c-mixing-up-links-with-names-that.patch        
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -270,7 +270,7 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
-#%patch0 -p1
+%patch0 -p1
 
 %build
 
@@ -396,6 +396,9 @@ popd
 %endif
 
 %changelog
+* Wed May 10 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-2
+- Added 0001-PROTON-1466-proton-c-mixing-up-links-with-names-that.patch
+
 * Tue Feb 21 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-1
 - Rebased to 0.17.0
 - Added *cpp* packages
