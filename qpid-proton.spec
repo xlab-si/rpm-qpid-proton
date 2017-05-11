@@ -274,7 +274,7 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %build
 
-CXX11FLAG="-std=c++11"
+CXX11FLAG="-std=c++11 -Wno-error=format-security"
 
 %if (0%{?rhel} && 0%{?rhel} <= 6) 
 CXX11FLAG=""
