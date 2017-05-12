@@ -283,14 +283,14 @@ CXX11FLAG=""
 %if 0%{?fedora}
 %cmake \
     -DPROTON_DISABLE_RPATH=true \
-   "-DCMAKE_CXX_FLAGS=$CXX11FLAG $CXXFLAGS" \
+   "-DCMAKE_CXX_FLAGS=$CXXFLAGS $CXX11FLAG" \
     -DSYSINSTALL_PYTHON=1 \
     -DSYSINSTALL_PERL=1 \
     .
 %endif
 %if 0%{?rhel}
 %cmake -DPROTON_DISABLE_RPATH=true \
-      "-DCMAKE_CXX_FLAGS=$CXX11FLAG $CXXFLAGS" \
+      "-DCMAKE_CXX_FLAGS=$CXXFLAGS CXX11FLAG" \
        -DCMAKE_EXE_LINKER_FLAGS="-Wl,-z,relro,-z,now" \
        -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,relro" \
        -DCMAKE_MODULE_LINKER_FLAGS="-Wl,-z,relro" \
