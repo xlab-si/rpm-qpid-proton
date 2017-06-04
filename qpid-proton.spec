@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.17.0
-Release:        2%{?dist}
+Release:        3%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -396,6 +396,9 @@ popd
 %endif
 
 %changelog
+* Sun Jun 04 2017 Jitka Plesnikova <jplesnik@redhat.com> - 0.17.0-3
+- Perl 5.26 rebuild
+
 * Wed May 10 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-2
 - Added 0001-PROTON-1466-proton-c-mixing-up-links-with-names-that.patch
 
