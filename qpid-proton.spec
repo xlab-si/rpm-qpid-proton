@@ -395,7 +395,7 @@ popd
 %endif
 
 %changelog
-* Thu Jun 22 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-4
+* Fri Jun 23 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-4
 - Excluded *.hpp files from qpid-proton-c-devel
 
 * Sun Jun 04 2017 Jitka Plesnikova <jplesnik@redhat.com> - 0.17.0-3
