@@ -119,6 +119,7 @@ Obsoletes: qpid-proton-devel
 %files c-devel
 %defattr(-,root,root,-)
 %{_includedir}/proton
+%exclude %{_includedir}/proton/*.hpp
 %exclude %{_includedir}/proton/**/*.hpp
 %{_libdir}/libqpid-proton.so
 %{_libdir}/libqpid-proton-core.so
