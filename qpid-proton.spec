@@ -48,6 +48,9 @@ BuildRequires:  epydoc
 %if 0%{?fedora} > 25
 BuildRequires:  perl-generators
 %endif
+%if 0%{?fedora} > 26
+BuildRequires:  glibc-headers
+%endif
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Test::Exception)
 BuildRequires:  perl(Test::More)
