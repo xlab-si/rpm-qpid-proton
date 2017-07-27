@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.17.0
-Release:        5%{?dist}
+Release:        6%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -398,6 +398,9 @@ popd
 %endif
 
 %changelog
+* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.0-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+
 * Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.17.0-5
 - Rebuild due to bug in RPM (RHBZ #1468476)
 
