@@ -143,6 +143,7 @@ Summary:   Development libraries for writing messaging apps with Qpid Proton
 %files cpp-devel
 %defattr(-,root,root,-)
 %{_includedir}/proton/*.hpp
+%{_includedir}/proton/**/*.hpp
 %{_libdir}/pkgconfig/libqpid-proton-cpp.pc
 %{_libdir}/libqpid-proton-cpp.so
 %{_libdir}/cmake/ProtonCpp
@@ -398,6 +399,9 @@ popd
 %endif
 
 %changelog
+* Mon Jul 31 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-6
+- Added missing *.hpp files in qpid-proton-cpp-devel package
+
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.0-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
