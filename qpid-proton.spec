@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.17.0
-Release:        7%{?dist}
+Release:        6%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -58,6 +58,7 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  cyrus-sasl-devel
 
 Patch0: 0001-PROTON-1466-proton-c-mixing-up-links-with-names-that.patch        
+Patch1: preliminary.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -274,6 +275,7 @@ Requires:  qpid-proton-c = %{version}-%{release}
 %prep
 %setup -q -n %{name}-%{version}
 %patch0 -p1
+%patch1 -p1
 
 %build
 
@@ -399,14 +401,9 @@ popd
 %endif
 
 %changelog
-* Thu Aug 03 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.0-7
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Binutils_Mass_Rebuild
-
-* Mon Jul 31 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-6
+* Tue Aug  8 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-6
 - Added missing *.hpp files in qpid-proton-cpp-devel package
-
-* Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 0.17.0-6
-- Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
+- Added preliminary patch to resolve install  issue
 
 * Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.17.0-5
 - Rebuild due to bug in RPM (RHBZ #1468476)
