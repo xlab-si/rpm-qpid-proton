@@ -58,7 +58,7 @@ BuildRequires:  perl(Test::More)
 BuildRequires:  cyrus-sasl-devel
 
 Patch0: 0001-PROTON-1466-proton-c-mixing-up-links-with-names-that.patch        
-Patch1: preliminary.patch
+Patch1: 0001-PROTON-1526-Ensure-the-module-.so-file-has-no-prefix.patch
 
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
@@ -403,7 +403,7 @@ popd
 %changelog
 * Tue Aug  8 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-6
 - Added missing *.hpp files in qpid-proton-cpp-devel package
-- Added preliminary patch to resolve install  issue
+- Resolves: PROTON-1526
 
 * Fri Jul 07 2017 Igor Gnatenko <ignatenko@redhat.com> - 0.17.0-5
 - Rebuild due to bug in RPM (RHBZ #1468476)
