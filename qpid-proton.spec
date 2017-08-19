@@ -17,7 +17,7 @@
 
 Name:           qpid-proton
 Version:        0.17.0
-Release:        7%{?dist}
+Release:        8%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 
@@ -204,17 +204,18 @@ Obsoletes: qpid-proton-cpp-devel-docs
 %doc %{proton_datadir}/examples/cpp/*.dox
 
 
-%package -n python-qpid-proton
+%package -n python2-qpid-proton
+%{?python_provide:%python_provide python2-qpid-proton}
 Group:    System Environment/Libraries
 Summary:  Python language bindings for the Qpid Proton messaging framework
 
 Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 Requires: python
 
-%description -n python-qpid-proton
+%description -n python2-qpid-proton
 %{summary}.
 
-%files -n python-qpid-proton
+%files -n python2-qpid-proton
 %defattr(-,root,root,-)
 %{python_sitearch}/_cproton.so
 %{python_sitearch}/cproton.*
@@ -232,7 +233,7 @@ Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 %description -n python3-qpid-proton
 %{summary}.
 
-%files -n python-qpid-proton
+%files -n python2-qpid-proton
 %defattr(-,root,root,-)
 %{python2_sitearch}/*
 
@@ -401,6 +402,10 @@ popd
 %endif
 
 %changelog
+* Sat Aug 19 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.17.0-8
+- Python 2 binary package renamed to python2-qpid-proton
+  See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
+
 * Wed Aug  9 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-7
 - - Resolves: PROTON-1526
 
