@@ -16,16 +16,24 @@
 }
 
 Name:           qpid-proton
-Version:        0.17.0
-Release:        8%{?dist}
+Version:        0.18.1
+Release:        1%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
-
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 
 Source0:        %{name}-%{version}.tar.gz
+#Patch0:         proton.patch
+
+Source1:        licenses.xml
+
+%global proton_licensedir %{_licensedir}/proton-%{version}
+%{!?_licensedir:%global license %doc}
+%{!?_licensedir:%global proton_licensedir %{proton_datadir}}
+
 BuildRequires:  gcc
+BuildRequires:  gcc-c++
 BuildRequires:  cmake
 BuildRequires:  swig
 BuildRequires:  pkgconfig
@@ -57,9 +65,6 @@ BuildRequires:  perl(Test::More)
 %endif
 BuildRequires:  cyrus-sasl-devel
 
-Patch0: 0001-PROTON-1466-proton-c-mixing-up-links-with-names-that.patch        
-Patch1: 0001-PROTON-1526-Ensure-the-module-.so-file-has-no-prefix.patch
-
 %description
 Proton is a high performance, lightweight messaging library. It can be used in
 the widest range of messaging applications including brokers, client libraries,
@@ -81,10 +86,12 @@ Obsoletes: qpid-proton
 %files c
 %defattr(-,root,root,-)
 %dir %{proton_datadir}
-%doc %{proton_datadir}/LICENSE
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
 %doc %{proton_datadir}/README*
 %{_libdir}/libqpid-proton.so.*
 %{_libdir}/libqpid-proton-core.so.*
+%{_libdir}/libqpid-proton-proactor.so.*
 
 %post c -p /sbin/ldconfig
 
@@ -102,7 +109,8 @@ Requires:  qpid-proton-c%{?_isa} = %{version}-%{release}
 %files cpp
 %defattr(-,root,root,-)
 %dir %{proton_datadir}
-%doc %{proton_datadir}/LICENSE
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
 %doc %{proton_datadir}/README*
 %{_libdir}/libqpid-proton-cpp.so.*
 
@@ -127,8 +135,10 @@ Obsoletes: qpid-proton-devel
 %exclude %{_includedir}/proton/**/*.hpp
 %{_libdir}/libqpid-proton.so
 %{_libdir}/libqpid-proton-core.so
+%{_libdir}/libqpid-proton-proactor.so
 %{_libdir}/pkgconfig/libqpid-proton.pc
 %{_libdir}/pkgconfig/libqpid-proton-core.pc
+%{_libdir}/pkgconfig/libqpid-proton-proactor.pc
 %{_libdir}/cmake/Proton
 
 
@@ -161,24 +171,17 @@ Obsoletes: qpid-proton-c-devel-docs
 
 %files c-docs
 %defattr(-,root,root,-)
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
 %doc %{proton_datadir}/docs/api-c
-%doc %{proton_datadir}/examples/*.py
-%exclude %{proton_datadir}/examples/*.pyc
-%exclude %{proton_datadir}/examples/*.pyo
-%doc %{proton_datadir}/examples/c/*.txt
-%doc %{proton_datadir}/examples/c/include
-%doc %{proton_datadir}/examples/c/messenger/*.txt
-%doc %{proton_datadir}/examples/c/messenger/*.c
-%doc %{proton_datadir}/examples/c/reactor/*.txt
-%doc %{proton_datadir}/examples/c/reactor/README
-%doc %{proton_datadir}/examples/c/reactor/*.c
-%doc %{proton_datadir}/examples/c/proactor/CMakeLists.txt
-%doc %{proton_datadir}/examples/c/proactor/*.c
-#%doc %{proton_datadir}/examples/c/proactor/*.h
-%doc %{proton_datadir}/examples/c/proactor/README.dox
-%doc %{proton_datadir}/examples/c/proactor/*.py*
-%exclude %{proton_datadir}/examples/c/proactor/*.pyc
-%exclude %{proton_datadir}/examples/c/proactor/*.pyo
+%doc %{proton_datadir}/examples/c/ssl_certs
+%doc %{proton_datadir}/examples/c/*.c
+%doc %{proton_datadir}/examples/c/*.h
+%doc %{proton_datadir}/examples/c/README.dox
+%doc %{proton_datadir}/examples/c/CMakeLists.txt
+%doc %{proton_datadir}/examples/c/example_test.py
+%exclude %{proton_datadir}/examples/c/*.pyc
+%exclude %{proton_datadir}/examples/c/*.pyo
 
 
 %package   cpp-docs
@@ -192,50 +195,70 @@ Obsoletes: qpid-proton-cpp-devel-docs
 
 %files cpp-docs
 %defattr(-,root,root,-)
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
 %{proton_datadir}/docs/api-cpp
-%doc %{proton_datadir}/examples/cpp/*.txt
 %doc %{proton_datadir}/examples/cpp/*.cpp
 %doc %{proton_datadir}/examples/cpp/*.hpp
-%doc %{proton_datadir}/examples/cpp/*.py*
-%exclude %{proton_datadir}/examples/cpp/*.pyo
-%exclude %{proton_datadir}/examples/cpp/*.pyc
-%doc %{proton_datadir}/examples/cpp/mt
+%doc %{proton_datadir}/examples/cpp/README.dox
+%doc %{proton_datadir}/examples/cpp/CMakeLists.txt
+%doc %{proton_datadir}/examples/cpp/example_test.py
 %doc %{proton_datadir}/examples/cpp/ssl_certs
-%doc %{proton_datadir}/examples/cpp/*.dox
+%doc %{proton_datadir}/examples/cpp/tutorial.dox
+%exclude %{proton_datadir}/examples/cpp/*.pyc
+%exclude %{proton_datadir}/examples/cpp/*.pyo
 
 
-%package -n python2-qpid-proton
-%{?python_provide:%python_provide python2-qpid-proton}
+%if 0%{?rhel}
+%package -n python-qpid-proton
 Group:    System Environment/Libraries
 Summary:  Python language bindings for the Qpid Proton messaging framework
 
 Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
 Requires: python
 
+%description -n python-qpid-proton
+%{summary}.
+
+%files -n python-qpid-proton
+%defattr(-,root,root,-)
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
+%{python_sitearch}/_cproton.so
+%{python_sitearch}/cproton.*
+%{python_sitearch}/proton/*
+%endif
+
+
+%if 0%{?fedora}
+%package -n python2-qpid-proton
+%{?python_provide:%python_provide python2-qpid-proton}
+Group:    System Environment/Libraries
+Summary:  Python language bindings for the Qpid Proton messaging framework
+
+Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
+Requires: python2
+
 %description -n python2-qpid-proton
 %{summary}.
 
 %files -n python2-qpid-proton
 %defattr(-,root,root,-)
-%{python_sitearch}/_cproton.so
-%{python_sitearch}/cproton.*
-%{python_sitearch}/proton/*
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
+%{python2_sitearch}/*
 
 
-%if 0%{?fedora}
 %package -n python3-qpid-proton
 Group:    System Environment/Libraries
 Summary:  Python language bindings for the Qpid Proton messaging framework
 %{?python_provide:%python_provide python3-qpid-proton}
 
 Requires: qpid-proton-c%{?_isa} = %{version}-%{release}
+Requires: python3
 
 %description -n python3-qpid-proton
 %{summary}.
-
-%files -n python2-qpid-proton
-%defattr(-,root,root,-)
-%{python2_sitearch}/*
 
 %files -n python3-qpid-proton
 %defattr(-,root,root,-)
@@ -253,9 +276,10 @@ Obsoletes:  python-qpid-proton-doc
 
 %files -n python-qpid-proton-docs
 %defattr(-,root,root,-)
+%license %{proton_licensedir}/LICENSE
+%license %{proton_licensedir}/licenses.xml
 %doc %{proton_datadir}/docs/api-py
 %doc %{proton_datadir}/examples/python
-
 
 %if 0%{?fedora}
 %package -n perl-qpid-proton
@@ -275,18 +299,13 @@ Requires:  qpid-proton-c = %{version}-%{release}
 
 %prep
 %setup -q -n %{name}-%{version}
-%patch0 -p1
-%patch1 -p1
+#%patch0 -p1
+
 
 %build
 
-CXX11FLAG="-std=c++11 -Wno-error=format-security"
-
-%if (0%{?rhel} && 0%{?rhel} <= 6) 
-CXX11FLAG=""
-%endif
-
 %if 0%{?fedora}
+CXX11FLAG=" -Wno-error=format-security"
 %cmake \
     -DPROTON_DISABLE_RPATH=true \
    "-DCMAKE_CXX_FLAGS=$CXXFLAGS $CXX11FLAG" \
@@ -296,7 +315,6 @@ CXX11FLAG=""
 %endif
 %if 0%{?rhel}
 %cmake -DPROTON_DISABLE_RPATH=true \
-      "-DCMAKE_CXX_FLAGS=$CXXFLAGS CXX11FLAG" \
        -DCMAKE_EXE_LINKER_FLAGS="-Wl,-z,relro,-z,now" \
        -DCMAKE_SHARED_LINKER_FLAGS="-Wl,-z,relro" \
        -DCMAKE_MODULE_LINKER_FLAGS="-Wl,-z,relro" \
@@ -321,7 +339,16 @@ rm -rf %{buildroot}
 CPROTON_BUILD=$PWD . ./config.sh
 
 chmod +x %{buildroot}%{python_sitearch}/_cproton.so
-find %{buildroot}%{proton_datadir}/examples/ -type f | xargs chmod -x 
+#find %{buildroot}%{proton_datadir}/examples/ -type f | xargs chmod -x 
+
+%if 0%{?rhel} && 0%{?rhel} <= 6
+install -pm 644 %{SOURCE1} %{buildroot}%{proton_datadir}/
+%else
+install -dm 755 %{buildroot}%{proton_licensedir}
+install -pm 644 %{SOURCE1} %{buildroot}%{proton_licensedir}
+install -pm 644 %{buildroot}%{proton_datadir}/LICENSE %{buildroot}%{proton_licensedir}
+rm -f %{buildroot}%{proton_datadir}/LICENSE
+%endif
 
 # clean up files that are not shipped
 rm -rf %{buildroot}%{_exec_prefix}/bindings
@@ -339,27 +366,17 @@ rm -rf %{buildroot}%{_datarootdir}/ruby
 rm -rf %{buildroot}%{_sysconfdir}/php.d
 %endif
 rm -fr %{buildroot}%{proton_datadir}/examples/CMakeFiles
-rm -f  %{buildroot}%{proton_datadir}/examples/CTestTestfile.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/Makefile
 rm -f  %{buildroot}%{proton_datadir}/examples/*.cmake
 rm -fr %{buildroot}%{proton_datadir}/examples/c/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/c/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/c/Makefile
-rm -fr %{buildroot}%{proton_datadir}/examples/c/messenger/CMakeFiles
-rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/*.cmake
-rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/Makefile
-rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/recv
-rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/recv-async
-rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/send
-rm -f  %{buildroot}%{proton_datadir}/examples/c/messenger/send-async
-rm -fr %{buildroot}%{proton_datadir}/examples/c/reactor/CMakeFiles
-rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/*.cmake
-rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/Makefile
-rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/receiver
-rm -f  %{buildroot}%{proton_datadir}/examples/c/reactor/sender
-rm -fr %{buildroot}%{proton_datadir}/examples/c/proactor/CMakeFiles
-rm -f  %{buildroot}%{proton_datadir}/examples/c/proactor/*.cmake
-rm -f  %{buildroot}%{proton_datadir}/examples/c/proactor/Makefile
+rm -f  %{buildroot}%{proton_datadir}/examples/c/broker
+rm -f  %{buildroot}%{proton_datadir}/examples/c/direct
+rm -f  %{buildroot}%{proton_datadir}/examples/c/receive
+rm -f  %{buildroot}%{proton_datadir}/examples/c/send
+rm -f  %{buildroot}%{proton_datadir}/examples/c/send-abort
+rm -f  %{buildroot}%{proton_datadir}/examples/c/send-ssl
 rm -fr %{buildroot}%{proton_datadir}/examples/cpp/CMakeFiles
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/*.cmake
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/Makefile
@@ -372,7 +389,6 @@ rm -f  %{buildroot}%{proton_datadir}/examples/cpp/encode_decode
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/flow_control
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/helloworld
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/helloworld_direct
-rm -f  %{buildroot}%{proton_datadir}/examples/cpp/mt_broker
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/queue_browser
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/scheduled_send_03
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/scheduled_send
@@ -384,6 +400,10 @@ rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_recv
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/simple_send
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl
 rm -f  %{buildroot}%{proton_datadir}/examples/cpp/ssl_client_cert
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/message_properties
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/multithreaded_client
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/multithreaded_client_flow_control
+rm -f  %{buildroot}%{proton_datadir}/examples/cpp/reconnect_client
 rm -fr %{buildroot}%{proton_datadir}/examples/engine/java
 rm -fr %{buildroot}%{proton_datadir}/examples/go
 rm -fr %{buildroot}%{proton_datadir}/examples/java
@@ -402,12 +422,15 @@ popd
 %endif
 
 %changelog
+* Thu Nov 16 2017 Irina Boverman <iboverma@redhat.com> - 0.18.1-1
+- Rebased to 0.18.1
+
 * Sat Aug 19 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.17.0-8
 - Python 2 binary package renamed to python2-qpid-proton
   See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
 
 * Wed Aug  9 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-7
-- - Resolves: PROTON-1526
+- Resolves: PROTON-1526
 
 * Tue Aug  8 2017 Irina Boverman <iboverma@redhat.com> - 0.17.0-6
 - Added missing *.hpp files in qpid-proton-cpp-devel package
