@@ -23,9 +23,7 @@ Summary:        A high performance, lightweight messaging library
 License:        ASL 2.0
 URL:            http://qpid.apache.org/proton/
 
-Source0:        %{name}-%{version}.tar.gz
-#Patch0:         proton.patch
-
+Source0:        http://www.apache.si/qpid/proton/%{version}/%{name}-%{version}.tar.gz
 Source1:        licenses.xml
 
 %global proton_licensedir %{_licensedir}/proton-%{version}
