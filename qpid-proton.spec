@@ -16,8 +16,8 @@
 }
 
 Name:           qpid-proton
-Version:        0.18.1
-Release:        2%{?dist}
+Version:        0.19.0
+Release:        1%{?dist}
 Group:          System Environment/Libraries
 Summary:        A high performance, lightweight messaging library
 License:        ASL 2.0
@@ -423,6 +423,9 @@ popd
 %endif
 
 %changelog
+* Sun Jan 14 2018 Tadej Borovšak <tadej.borovsak@xlab.si> - 0.19.0-1
+- Rebased to 0.19.0
+
 * Sun Dec 17 2017 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl> - 0.18.1-2
 - Python 2 binary package renamed to python2-qpid-proton
   See https://fedoraproject.org/wiki/FinalizingFedoraSwitchtoPython3
